@@ -1,16 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blitzlesen</title>
-    <link href="src/styles/main.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesetrainer | Giesberg Diagnostik</title>
+  <link rel="stylesheet" href="../../shared/css/giesberg-design.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .placeholder-content {
+      max-width: var(--max-width-narrow);
+      margin: var(--space-3xl) auto;
+      text-align: center;
+      padding: 0 var(--space-xl);
+    }
+    .placeholder-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-lg);
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <input type="file" accept="text/csv" />
+
+  <!-- Header -->
+  <header class="g-page-header">
+    <div class="g-container">
+      <div class="g-page-header__brand">Giesberg Diagnostik</div>
+      <h1>HB Lesetaktiken-Trainer</h1>
+      <p>Lesetaktik-Training f&uuml;r hochbegabte Kinder</p>
+      <nav class="g-page-header__nav">
+        <a href="../../portal/index.html">&larr; Zur&uuml;ck zum Portal</a>
+        <a href="#" class="active">Lesetrainer</a>
+      </nav>
     </div>
-    <script src="src/js/app.js"></script>
+  </header>
+
+  <main class="placeholder-content">
+    <div class="placeholder-icon">&#128218;</div>
+    <h2>In Entwicklung</h2>
+    <p>
+      Der HB Lesetaktiken-Trainer wird derzeit entwickelt. Dieses Tool wird
+      gezieltes Lesetaktik-Training f&uuml;r hochbegabte Kinder erm&ouml;glichen &ndash;
+      mit CSV-Import f&uuml;r individuelle Wortlisten und adaptiver Schwierigkeitsstufe.
+    </p>
+    <a href="../../portal/index.html" class="g-btn g-btn--primary g-mt-lg">Zum Portal</a>
+  </main>
+
+  <!-- Footer -->
+  <footer class="g-footer g-no-print">
+    <div class="g-container">
+      <p>&copy; 2026 Stefan Giesberg | <a href="../../portal/index.html">Zur&uuml;ck zum Portal</a></p>
+    </div>
+  </footer>
+
 </body>
 </html>
