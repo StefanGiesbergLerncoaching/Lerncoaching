@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stefan Giesberg | Diagnostik-Tools</title>
+  <link rel="stylesheet" href="../shared/css/giesberg-design.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Portal-spezifische Styles */
+    .hero {
+      background: var(--color-primary);
+      color: var(--color-white);
+      padding: var(--space-3xl) 0;
+      text-align: center;
+    }
+
+    .hero h1 {
+      color: var(--color-white);
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: var(--space-md);
+    }
+
+    .hero__subtitle {
+      font-size: var(--font-size-lg);
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 600px;
+      margin: 0 auto var(--space-xl);
+    }
+
+    .hero__brand {
+      font-size: var(--font-size-sm);
+      color: var(--color-accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--space-md);
+    }
+
+    .tools-section {
+      padding: var(--space-3xl) 0;
+    }
+
+    .tools-section h2 {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .tool-card {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+      transition: all var(--transition-base);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border: 2px solid transparent;
+    }
+
+    .tool-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+      border-color: var(--color-accent);
+    }
+
+    .tool-card__icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .tool-card__title {
+      font-size: var(--font-size-xl);
+      color: var(--color-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .tool-card__description {
+      color: var(--color-text-light);
+      flex-grow: 1;
+      margin-bottom: var(--space-lg);
+    }
+
+    .tool-card__status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-dot--live { background: var(--color-success); }
+    .status-dot--beta { background: var(--color-accent); }
+    .status-dot--planned { background: var(--color-text-subtle); }
+
+    .about-section {
+      background: var(--color-white);
+      padding: var(--space-3xl) 0;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      text-align: center;
+      margin-top: var(--space-2xl);
+    }
+
+    .stat__number {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    .stat__label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="g-container">
+      <div class="hero__brand">Giesberg Diagnostik</div>
+      <h1>Lerncoaching f&uuml;r hochbegabte Kinder</h1>
+      <p class="hero__subtitle">
+        Diagnostik-Tools &amp; Interventionsmethoden f&uuml;r die Identifikation und Korrektur
+        didaktisch induzierter Lernprobleme bei hochbegabten Kindern.
+      </p>
+      <a href="#tools" class="g-btn g-btn--primary g-btn--lg">Tools entdecken</a>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="tools-section" id="tools">
+    <div class="g-container">
+      <h2>Diagnostik-Toolbox</h2>
+      <div class="g-grid g-grid--3">
+
+        <!-- Oberl&auml;ngen-Generator -->
+        <a href="../tools/oberlaengen-generator/index.html" style="text-decoration: none; color: inherit;">
+          <div class="tool-card">
+            <div class="tool-card__icon">Aa</div>
+            <div class="tool-card__status">
+              <span class="status-dot status-dot--live"></span>
+              Produktiv
+            </div>
+            <h3 class="tool-card__title">Oberl&auml;ngen-Generator</h3>
+            <p class="tool-card__description">
+              Texte mit manipulierten Buchstabenh&ouml;hen erstellen. Zeigt, ob ein Kind echtes
+              Dekodieren nutzt oder aus dem Kontext r&auml;t. Mit Leetspeak-Modus und
+              Buchstaben-Mischung.
+            </p>
+            <span class="g-btn g-btn--outline g-btn--sm">Tool &ouml;ffnen &rarr;</span>
+          </div>
+        </a>
+
+        <!-- Eye-Tracking -->
+        <div class="tool-card" style="opacity: 0.8;">
+          <div class="tool-card__icon">&#128065;</div>
+          <div class="tool-card__status">
+            <span class="status-dot status-dot--beta"></span>
+            MVP v2.0 &ndash; Beta
+          </div>
+          <h3 class="tool-card__title">Eye-Tracking Diagnostik</h3>
+          <p class="tool-card__description">
+            Webcam-basierte Blickbewegungsanalyse beim Lesen. Multi-Line-Tracking mit
+            automatischer Klassifikation: Dekodierer, Rater oder Kompensator.
+            227 Metriken, 5 Visualisierungen.
+          </p>
+          <span class="g-badge g-badge--accent">Demnächst verf&uuml;gbar</span>
+        </div>
+
+        <!-- Gutachten-Generator -->
+        <div class="tool-card" style="opacity: 0.8;">
+          <div class="tool-card__icon">&#128196;</div>
+          <div class="tool-card__status">
+            <span class="status-dot status-dot--planned"></span>
+            In Entwicklung
+          </div>
+          <h3 class="tool-card__title">Gutachten-Generator</h3>
+          <p class="tool-card__description">
+            Automatisierte Erstellung professioneller Diagnostik-Gutachten als PDF.
+            Modularer Aufbau: Beobachtungen, Differentialdiagnose, Taktiken-Tabelle,
+            Interventionsempfehlung.
+          </p>
+          <span class="g-badge g-badge--accent">In Planung</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Konzept-Kurzfassung -->
+  <section class="about-section">
+    <div class="g-container">
+      <div class="about-grid">
+        <div>
+          <h2>Das Konzept</h2>
+          <p>
+            Hochbegabte Kinder lernen anders &ndash; aber die Grundschule lehrt alle gleich.
+            Das Ergebnis: Kinder nutzen ineffiziente Lese- und Schreibtaktiken, die sie
+            ersch&ouml;pfen, obwohl sie hochintelligent sind.
+          </p>
+          <p>
+            Wir identifizieren und korrigieren diese <strong>didaktisch induzierten</strong>
+            Fehlpassungen &ndash; keine jahrelange Therapie, sondern gezielte Taktik-Korrektur,
+            meist in 2&ndash;3 Sitzungen.
+          </p>
+          <a href="https://stefangiesberg.de" class="g-btn g-btn--primary g-mt-md" target="_blank">
+            Mehr erfahren &rarr;
+          </a>
+        </div>
+        <div>
+          <div class="g-card g-card--accent">
+            <h4>Unser Ansatz vs. traditionelle LRS-F&ouml;rderung</h4>
+            <table style="width: 100%; margin-top: var(--space-md); font-size: var(--font-size-sm);">
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: var(--space-sm); font-weight: 600;">Dauer</td>
+                <td style="padding: var(--space-sm); color: var(--color-text-light);">2&ndash;3 Sitzungen statt 6&ndash;24 Monate</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: var(--space-sm); font-weight: 600;">Methode</td>
+                <td style="padding: var(--space-sm); color: var(--color-text-light);">Taktik-Korrektur statt repetitives Training</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: var(--space-sm); font-weight: 600;">Grundannahme</td>
+                <td style="padding: var(--space-sm); color: var(--color-text-light);">Didaktisch induziert, nicht prim&auml;r neurologisch</td>
+              </tr>
+              <tr>
+                <td style="padding: var(--space-sm); font-weight: 600;">Kosten</td>
+                <td style="padding: var(--space-sm); color: var(--color-text-light);">100&ndash;300&euro; Gesamtinvestition</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="g-footer">
+    <div class="g-container">
+      <p>&copy; 2026 Stefan Giesberg | Lerncoaching f&uuml;r hochbegabte Kinder</p>
+      <p class="g-mt-sm">
+        <a href="https://stefangiesberg.de" target="_blank">stefangiesberg.de</a>
+        &nbsp;&middot;&nbsp;
+        <a href="https://stefangiesberg.de/impressum" target="_blank">Impressum</a>
+        &nbsp;&middot;&nbsp;
+        <a href="https://stefangiesberg.de/datenschutz" target="_blank">Datenschutz</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

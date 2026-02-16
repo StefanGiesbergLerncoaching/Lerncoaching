@@ -1,0 +1,457 @@
+/* ============================================================
+   GIESBERG DIAGNOSTIK - Design System v1.0
+   Stefan Giesberg | Lerncoaching für hochbegabte Kinder
+
+   Farbpalette aus PROJEKT_MASTER:
+   - Primary:    #2D4059 (Dunkelblau)
+   - Accent/CTA: #F39C12 (Orange/Gold)
+   - Light:      #ECF0F1 (Hellgrau)
+   - Text:       #2C3E50 (Dunkel)
+   - Subtle:     #7F8C8D (Grau)
+
+   Typographie: Inter / System-UI, Basis 18px
+   ============================================================ */
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Farben */
+  --color-primary: #2D4059;
+  --color-primary-light: #3D5A80;
+  --color-primary-dark: #1B2A3D;
+  --color-accent: #F39C12;
+  --color-accent-hover: #E67E22;
+  --color-accent-light: #FDF2E0;
+  --color-light: #ECF0F1;
+  --color-white: #FFFFFF;
+  --color-text: #2C3E50;
+  --color-text-light: #7F8C8D;
+  --color-text-subtle: #95A5A6;
+  --color-border: #DEE2E6;
+  --color-success: #27AE60;
+  --color-warning: #F39C12;
+  --color-error: #E74C3C;
+  --color-info: #3498DB;
+
+  /* Typographie */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-size-base: 18px;
+  --font-size-sm: 0.875rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  --line-height-base: 1.6;
+  --line-height-tight: 1.3;
+
+  /* Abstände */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Layout */
+  --max-width: 1200px;
+  --max-width-narrow: 800px;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 20px;
+
+  /* Schatten */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+}
+
+/* --- Reset & Basis --- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--color-text);
+  line-height: var(--line-height-base);
+  background: var(--color-light);
+}
+
+/* --- Typographie --- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  color: var(--color-primary);
+}
+
+h1 { font-size: var(--font-size-3xl); margin-bottom: var(--space-lg); }
+h2 { font-size: var(--font-size-2xl); margin-bottom: var(--space-md); }
+h3 { font-size: var(--font-size-xl); margin-bottom: var(--space-md); }
+h4 { font-size: var(--font-size-lg); margin-bottom: var(--space-sm); }
+
+p {
+  margin-bottom: var(--space-md);
+  max-width: 70ch;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+/* --- Layout-Container --- */
+.g-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+.g-container--narrow {
+  max-width: var(--max-width-narrow);
+}
+
+/* --- Page Header (gemeinsam für alle Tools) --- */
+.g-page-header {
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: var(--space-xl) 0;
+  position: relative;
+}
+
+.g-page-header h1 {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
+.g-page-header p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-lg);
+  margin-bottom: 0;
+}
+
+.g-page-header__brand {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-sm);
+}
+
+.g-page-header__nav {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.g-page-header__nav a {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-fast);
+}
+
+.g-page-header__nav a:hover,
+.g-page-header__nav a.active {
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+/* --- Cards --- */
+.g-card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-xl);
+  transition: box-shadow var(--transition-base);
+}
+
+.g-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.g-card--accent {
+  border-left: 4px solid var(--color-accent);
+}
+
+.g-card__title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-sm);
+}
+
+.g-card__description {
+  color: var(--color-text-light);
+  margin-bottom: var(--space-lg);
+}
+
+/* --- Buttons --- */
+.g-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+.g-btn--primary {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+}
+
+.g-btn--primary:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+  color: var(--color-white);
+}
+
+.g-btn--secondary {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.g-btn--secondary:hover {
+  border-color: var(--color-primary);
+  background: var(--color-light);
+  text-decoration: none;
+}
+
+.g-btn--outline {
+  background: transparent;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.g-btn--outline:hover {
+  background: var(--color-accent);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.g-btn--sm {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.g-btn--lg {
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-lg);
+}
+
+/* --- Formulare --- */
+.g-input,
+.g-select,
+.g-textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-white);
+  transition: border-color var(--transition-fast);
+}
+
+.g-input:focus,
+.g-select:focus,
+.g-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(45, 64, 89, 0.1);
+}
+
+.g-label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.g-form-group {
+  margin-bottom: var(--space-lg);
+}
+
+/* --- Range Slider (Giesberg-Style) --- */
+.g-range {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  outline: none;
+}
+
+.g-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.g-range::-webkit-slider-thumb:hover {
+  background: var(--color-primary-light);
+  transform: scale(1.15);
+}
+
+/* --- Badge / Tag --- */
+.g-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.g-badge--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.g-badge--accent {
+  background: var(--color-accent-light);
+  color: var(--color-accent-hover);
+}
+
+.g-badge--success {
+  background: #D4EDDA;
+  color: #155724;
+}
+
+/* --- Info Box --- */
+.g-info {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--space-lg);
+}
+
+.g-info--tip {
+  background: var(--color-accent-light);
+  border-left: 4px solid var(--color-accent);
+}
+
+.g-info--note {
+  background: #D6EAF8;
+  border-left: 4px solid var(--color-info);
+}
+
+.g-info--warning {
+  background: #FDEBD0;
+  border-left: 4px solid var(--color-warning);
+}
+
+/* --- Footer --- */
+.g-footer {
+  background: var(--color-primary-dark);
+  color: rgba(255, 255, 255, 0.6);
+  padding: var(--space-xl) 0;
+  margin-top: var(--space-3xl);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.g-footer a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.g-footer a:hover {
+  color: var(--color-accent);
+}
+
+/* --- Grid-Helfer --- */
+.g-grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.g-grid--2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.g-grid--3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.g-grid--4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+/* --- Utility Classes --- */
+.g-text-center { text-align: center; }
+.g-text-subtle { color: var(--color-text-subtle); }
+.g-mt-sm { margin-top: var(--space-sm); }
+.g-mt-md { margin-top: var(--space-md); }
+.g-mt-lg { margin-top: var(--space-lg); }
+.g-mt-xl { margin-top: var(--space-xl); }
+.g-mb-md { margin-bottom: var(--space-md); }
+.g-mb-lg { margin-bottom: var(--space-lg); }
+.g-flex { display: flex; }
+.g-flex-wrap { flex-wrap: wrap; }
+.g-gap-sm { gap: var(--space-sm); }
+.g-gap-md { gap: var(--space-md); }
+.g-gap-lg { gap: var(--space-lg); }
+.g-items-center { align-items: center; }
+.g-justify-between { justify-content: space-between; }
+
+/* --- Print Styles (global) --- */
+@media print {
+  body { background: white; }
+  .g-page-header, .g-footer, .g-no-print { display: none !important; }
+  .g-card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  :root {
+    --font-size-base: 16px;
+    --space-xl: 1.5rem;
+    --space-2xl: 2rem;
+  }
+
+  h1 { font-size: var(--font-size-2xl); }
+  h2 { font-size: var(--font-size-xl); }
+
+  .g-container { padding: 0 var(--space-md); }
+
+  .g-page-header__nav {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "baseline_multiline_v1",
+  "title": "Der Apfelbaum (Multi-Line)",
+  "description": "3-Zeilen-Test-Text mit verschiedenen Tracking-Modi",
+  "lines": [
+    {
+      "line_id": 1,
+      "tracking_mode": "vertical",
+      "text": "Im Garten steht ein großer Apfelbaum.",
+      "chunks": [
+        {
+          "chunk_id": 0,
+          "text": "Im Garten",
+          "words": ["Im", "Garten"]
+        },
+        {
+          "chunk_id": 1,
+          "text": "steht",
+          "words": ["steht"]
+        },
+        {
+          "chunk_id": 2,
+          "text": "ein großer",
+          "words": ["ein", "großer"]
+        },
+        {
+          "chunk_id": 3,
+          "text": "Apfelbaum.",
+          "words": ["Apfelbaum."]
+        }
+      ]
+    },
+    {
+      "line_id": 2,
+      "tracking_mode": "syllables",
+      "text": "Seine Äste hängen voller roter Früchte.",
+      "syllables": [
+        { "syl_id": 0, "text": "Sei", "word": "Seine" },
+        { "syl_id": 1, "text": "ne", "word": "Seine" },
+        { "syl_id": 2, "text": "Äs", "word": "Äste" },
+        { "syl_id": 3, "text": "te", "word": "Äste" },
+        { "syl_id": 4, "text": "hän", "word": "hängen" },
+        { "syl_id": 5, "text": "gen", "word": "hängen" },
+        { "syl_id": 6, "text": "vol", "word": "voller" },
+        { "syl_id": 7, "text": "ler", "word": "voller" },
+        { "syl_id": 8, "text": "ro", "word": "roter" },
+        { "syl_id": 9, "text": "ter", "word": "roter" },
+        { "syl_id": 10, "text": "Früch", "word": "Früchte." },
+        { "syl_id": 11, "text": "te.", "word": "Früchte." }
+      ]
+    },
+    {
+      "line_id": 3,
+      "tracking_mode": "standard",
+      "text": "Jeden Herbst pflücken wir die süßen Äpfel.",
+      "words": [
+        { "word_id": 0, "text": "Jeden" },
+        { "word_id": 1, "text": "Herbst" },
+        { "word_id": 2, "text": "pflücken" },
+        { "word_id": 3, "text": "wir" },
+        { "word_id": 4, "text": "die" },
+        { "word_id": 5, "text": "süßen" },
+        { "word_id": 6, "text": "Äpfel." }
+      ]
+    }
+  ]
+}

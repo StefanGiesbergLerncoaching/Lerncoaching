@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye-Tracking Lese-Diagnostik v2.0</title>
+    
+    <!-- WebGazer.js (ZUERST laden!) -->
+    <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+    
+    <!-- AOI-Tracker v2.0 -->
+    <script src="js/aoi-tracker-v2.js"></script>
+    
+    <style>
+        /* ===== GLOBALE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        /* ===== TEXT-STIMULUS (Responsive) ===== */
+        .text-stimulus {
+            font-size: 48px;
+            line-height: 1.6;
+            color: black;
+            max-width: 1200px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive Schriftgrößen */
+        @media (max-height: 900px) {
+            .text-stimulus { font-size: 40px; }
+        }
+        
+        @media (max-height: 768px) {
+            .text-stimulus { font-size: 32px; }
+        }
+        
+        @media (min-height: 1200px) {
+            .text-stimulus { font-size: 60px; }
+        }
+        
+        .text-stimulus p {
+            margin: 0 0 30px 0;
+        }
+        
+        /* Chunking & Silben & Wörter */
+        .chunk, .syllable, .word {
+            display: inline-block;
+            margin-right: 0.2em;
+            padding: 3px 5px;
+        }
+        
+        .chunk:hover, .syllable:hover, .word:hover {
+            background: rgba(0, 123, 255, 0.1);
+            cursor: default;
+        }
+        
+        /* ===== KALIBRIERUNGS-PUNKT ===== */
+        #calibration-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 9999;
+        }
+        
+        #calibration-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+            z-index: 9998;
+        }
+        
+        /* ===== CONTAINER ===== */
+        .screen {
+            display: none;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* ===== INSTRUKTIONEN ===== */
+        .instruction-screen {
+            text-align: center;
+        }
+        
+        .instruction-screen h1 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .instruction-screen h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .instruction-screen p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .instruction-screen ul {
+            text-align: left;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background: #229954;
+        }
+        
+        /* Button fest am unteren Rand */
+        #finish-button-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+    </style>
+    
+    <script>
+        // ===== GLOBALE VARIABLEN =====
+        let tracker = null;
+        let textData = null;
+        
+        // Kalibrierungs-Variablen
+        const calibrationPoints = [
+            [10, 10], [10, 50], [10, 90],
+            [50, 10], [50, 50], [50, 90],
+            [90, 10], [90, 50], [90, 90]
+        ];
+        let currentPointIndex = 0;
+        let clicksForCurrentPoint = 0;
+        const clicksPerPoint = 3;
+        
+        // ===== HILFSFUNKTIONEN =====
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // ===== TEXT LADEN =====
+        async function loadText() {
+            const response = await fetch('stimuli/baseline/text_multiline.json');
+            textData = await response.json();
+            
+            // HTML generieren für 3 Zeilen
+            let html = '';
+            
+            textData.lines.forEach(line => {
+                html += '<p>';
+                
+                if (line.tracking_mode === 'vertical') {
+                    // Zeile 1: Chunks
+                    line.chunks.forEach((chunk, idx) => {
+                        html += `<span class="chunk" id="line1_chunk_${idx}">${chunk.text}</span> `;
+                    });
+                } else if (line.tracking_mode === 'syllables') {
+                    // Zeile 2: Silben
+                    line.syllables.forEach((syl, idx) => {
+                        html += `<span class="syllable" id="line2_syl_${idx}">${syl.text}</span>`;
+                    });
+                } else if (line.tracking_mode === 'standard') {
+                    // Zeile 3: Wörter
+                    line.words.forEach((word, idx) => {
+                        html += `<span class="word" id="line3_word_${idx}">${word.text}</span> `;
+                    });
+                }
+                
+                html += '</p>';
+            });
+            
+            document.getElementById('text-container').innerHTML = html;
+        }
+        
+        // ===== KALIBRIERUNG =====
+        async function startCalibration() {
+            showScreen('calibration-screen');
+            
+            // WebGazer starten
+            await webgazer.setRegression('ridge')
+                .setGazeListener(function(data, clock) {})
+                .begin();
+            
+            webgazer.showVideoPreview(true)
+                .showPredictionPoints(true);
+            
+            // Webcam-Preview rechts unten positionieren (nach kurzer Verzögerung)
+            setTimeout(() => {
+                const video = document.getElementById('webgazerVideoFeed');
+                if (video) {
+                    video.style.position = 'fixed';
+                    video.style.bottom = '20px';
+                    video.style.right = '20px';
+                    video.style.width = '200px';
+                    video.style.height = 'auto';
+                    video.style.zIndex = '9997';
+                }
+                
+                document.getElementById('calibration-info').style.display = 'block';
+                showNextCalibrationPoint();
+            }, 1000);
+        }
+        
+        function showNextCalibrationPoint() {
+            if (currentPointIndex >= calibrationPoints.length) {
+                finishCalibration();
+                return;
+            }
+            
+            const point = calibrationPoints[currentPointIndex];
+            const dot = document.getElementById('calibration-dot');
+            
+            const x = window.innerWidth * point[0] / 100;
+            const y = window.innerHeight * point[1] / 100;
+            
+            dot.style.left = (x - 10) + 'px';
+            dot.style.top = (y - 10) + 'px';
+            dot.style.display = 'block';
+            
+            document.getElementById('cal-current').textContent = currentPointIndex + 1;
+            document.getElementById('cal-total').textContent = calibrationPoints.length;
+            document.getElementById('cal-clicks').textContent = '0';
+            
+            clicksForCurrentPoint = 0;
+            dot.onclick = handleCalibrationClick;
+        }
+        
+        function handleCalibrationClick(event) {
+            const dot = event.target;
+            const x = parseFloat(dot.style.left) + 10;
+            const y = parseFloat(dot.style.top) + 10;
+            
+            webgazer.recordScreenPosition(x, y, 'click');
+            
+            clicksForCurrentPoint++;
+            document.getElementById('cal-clicks').textContent = clicksForCurrentPoint;
+            
+            if (clicksForCurrentPoint >= clicksPerPoint) {
+                currentPointIndex++;
+                setTimeout(showNextCalibrationPoint, 500);
+            }
+        }
+        
+        function finishCalibration() {
+            document.getElementById('calibration-dot').style.display = 'none';
+            document.getElementById('calibration-info').style.display = 'none';
+            webgazer.showPredictionPoints(false);
+            
+            showScreen('transition-screen');
+        }
+        
+        // ===== LESEN =====
+        async function startReading() {
+            showScreen('text-screen');
+            
+            if (!textData) {
+                await loadText();
+            }
+            
+            // Tracker initialisieren
+            tracker = new AOITracker(textData);
+            tracker.initializeAOIs();
+            tracker.startTracking();
+            
+            // WebGazer Listener aktivieren
+            webgazer.setGazeListener(function(data, elapsedTime) {
+                if (data == null || !tracker) return;
+                tracker.processGazePoint(data.x, data.y, elapsedTime);
+            });
+            
+            console.log('[Reading] Tracking gestartet');
+        }
+        
+        function finishReading() {
+            tracker.stopTracking();
+            webgazer.pause();
+            
+            console.log('[Reading] Tracking gestoppt');
+            
+            // Daten herunterladen
+            downloadData();
+            
+            showScreen('end-screen');
+            
+            setTimeout(() => {
+                document.getElementById('download-status').textContent = 
+                    '3 CSV-Dateien wurden heruntergeladen! ✓';
+            }, 1000);
+        }
+        
+        // ===== CSV-DOWNLOAD =====
+        function downloadData() {
+            const timestamp = Date.now();
+            const participantId = `TEST_${timestamp}`;
+            
+            const csvData = tracker.exportToCSV();
+            
+            // Metadaten-Header (für alle 3 CSVs gleich)
+            const metadataHeader = `# EXPERIMENT METADATA
+# Participant ID: ${participantId}
+# Date: ${new Date().toISOString()}
+# Text: ${textData.id}
+
+`;
+            
+            // Line 1: Vertical
+            downloadCSVFile(
+                `line1_vertical_${timestamp}.csv`,
+                metadataHeader + '# LINE 1: VERTICAL TRACKING (Chunks)\n' + csvData.line1
+            );
+            
+            // Line 2: Syllables
+            downloadCSVFile(
+                `line2_syllables_${timestamp}.csv`,
+                metadataHeader + '# LINE 2: SYLLABLE TRACKING\n' + csvData.line2
+            );
+            
+            // Line 3: Words
+            downloadCSVFile(
+                `line3_words_${timestamp}.csv`,
+                metadataHeader + '# LINE 3: STANDARD WORD TRACKING\n' + csvData.line3
+            );
+            
+            console.log('[Download] 3 CSV-Dateien erstellt');
+        }
+        
+        function downloadCSVFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</head>
+<body>
+    <!-- Kalibrierungs-Punkt -->
+    <div id="calibration-dot"></div>
+    
+    <!-- Kalibrierungs-Info -->
+    <div id="calibration-info">
+        <div>Punkt <span id="cal-current">1</span> von <span id="cal-total">9</span></div>
+        <div>Klick: <span id="cal-clicks">0</span> / 3</div>
+    </div>
+    
+    <!-- Screen 1: Willkommen -->
+    <div id="welcome-screen" class="screen active">
+        <div class="instruction-screen">
+            <h1>👁️ Willkommen zum Eye-Tracking Test!</h1>
+            <p>In diesem Test wirst du einen kurzen Text sehen (3 Zeilen).</p>
+            <p>Bitte lies den Text <strong>langsam und laut vor</strong>.</p>
+            <br>
+            <p><strong>Wichtig:</strong></p>
+            <ul>
+                <li>Sitze bequem vor dem Bildschirm (50-60cm Abstand)</li>
+                <li>Dein Gesicht sollte gut beleuchtet sein (frontal, nicht von hinten)</li>
+                <li>Halte deinen Kopf möglichst ruhig</li>
+                <li><strong>Brille abnehmen für bessere Kalibrierung!</strong></li>
+            </ul>
+            <br>
+            <p>Zuerst kommt eine kurze Kalibrierung (~30 Sekunden).</p>
+            <button onclick="startCalibration()">🚀 Starten</button>
+        </div>
+    </div>
+    
+    <!-- Screen 2: Kalibrierung -->
+    <div id="calibration-screen" class="screen">
+        <div class="instruction-screen">
+            <h2>Kalibrierung läuft...</h2>
+            <p>Klicke auf jeden roten Punkt <strong>3×</strong>.</p>
+            <p><strong>Wichtig: Schaue dabei den Punkt an (nicht die Maus!)</strong></p>
+        </div>
+    </div>
+    
+    <!-- Screen 3: Übergang -->
+    <div id="transition-screen" class="screen">
+        <div class="instruction-screen">
+            <h2>✓ Kalibrierung abgeschlossen!</h2>
+            <p>Jetzt kommt der Text.</p>
+            <p>Bitte lies <strong>langsam und laut vor</strong>.</p>
+            <p>(Nicht speedreaden!)</p>
+            <button onclick="startReading()">📖 Text zeigen</button>
+        </div>
+    </div>
+    
+    <!-- Screen 4: Text -->
+    <div id="text-screen" class="screen">
+        <div class="text-stimulus" id="text-container"></div>
+        
+        <!-- Button fest am unteren Rand -->
+        <div id="finish-button-container">
+            <button onclick="finishReading()">✓ Fertig</button>
+        </div>
+    </div>
+    
+    <!-- Screen 5: Ende -->
+    <div id="end-screen" class="screen">
+        <div class="instruction-screen">
+            <h1>🎉 Fertig!</h1>
+            <p>Vielen Dank fürs Mitmachen!</p>
+            <p id="download-status">Die Daten werden heruntergeladen...</p>
+            <br><br>
+            <p><strong>Nächste Schritte:</strong></p>
+            <ul>
+                <li>Öffne Terminal/Kommandozeile</li>
+                <li>Führe das Python-Analyse-Script aus:</li>
+            </ul>
+            <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; text-align: left; max-width: 600px; margin: 20px auto;">
+python analysis/analyze_eyetracking.py \
+  line1_vertical_*.csv \
+  line2_syllables_*.csv \
+  line3_words_*.csv
+            </pre>
+            <p>Output: <code>output_analysis/</code> Ordner</p>
+        </div>
+    </div>
+</body>
+</html>
