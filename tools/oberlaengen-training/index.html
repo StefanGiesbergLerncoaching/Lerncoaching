@@ -49,6 +49,34 @@
       margin-bottom: var(--space-lg);
     }
 
+    /* Vortext Panel */
+    .pretext-panel {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      border-left: 4px solid var(--color-info);
+    }
+
+    .pretext-panel h3 {
+      margin-bottom: var(--space-sm);
+      color: var(--color-info);
+    }
+
+    .pretext-hint {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-subtle);
+      margin-bottom: var(--space-md);
+    }
+
+    .pretext-editor {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      min-height: 120px;
+      resize: vertical;
+    }
+
     /* Markdown Textarea */
     .markdown-editor {
       font-family: var(--font-mono);
@@ -322,6 +350,7 @@
 
     .pdf-render p {
       margin-bottom: 0.8em;
+      max-width: none;
     }
 
     .pdf-render strong { font-weight: 700; }
@@ -367,8 +396,25 @@
 
       <!-- === LINKE SPALTE: EDITOR === -->
       <div>
+        <!-- Vortext (unver&auml;ndert im PDF) -->
+        <div class="pretext-panel">
+          <h3>Vortext (ohne Oberl&auml;ngen-&Auml;nderung)</h3>
+          <div class="pretext-hint">
+            Dieser Text erscheint im PDF <strong>vor</strong> dem Lesetext &ndash; unver&auml;ndert, ohne Clipping.
+            Z.B. Ansprache ans Kind, Anleitung f&uuml;r Eltern, Aufgabenstellung.
+          </div>
+          <div class="format-toolbar">
+            <button type="button" class="fmt-btn" onclick="wrapSelectionIn('pretextInput', '**')" title="Fett"><strong>B</strong></button>
+            <button type="button" class="fmt-btn" onclick="wrapSelectionIn('pretextInput', '*')" title="Kursiv"><em>I</em></button>
+            <button type="button" class="fmt-btn" onclick="wrapSelectionIn('pretextInput', '__')" title="Unterstrichen"><u>U</u></button>
+            <div class="fmt-divider"></div>
+            <button type="button" class="fmt-btn" onclick="insertAtCursorIn('pretextInput', '\n\n')" title="Neuer Absatz">&para;</button>
+          </div>
+          <textarea class="g-textarea pretext-editor" id="pretextInput" placeholder="z.B. Liebe Mia, lies den Text und versuche alle W&ouml;rter zu erkennen...&#10;&#10;Oder: Liebe Eltern, bitte lassen Sie Ihr Kind diesen Text laut vorlesen..."></textarea>
+        </div>
+
         <div class="editor-panel">
-          <h3>Text eingeben</h3>
+          <h3>Lesetext (mit Oberl&auml;ngen-Clipping)</h3>
 
           <!-- Metadaten -->
           <div class="meta-row">
@@ -506,15 +552,25 @@
       renderPreviewButtons();
       updatePreview();
 
-      // Live-Update
+      // Live-Update for both editors
       document.getElementById('editorInput').addEventListener('input', updatePreview);
+      document.getElementById('pretextInput').addEventListener('input', updatePreview);
 
-      // Keyboard shortcuts
+      // Keyboard shortcuts for main editor
       document.getElementById('editorInput').addEventListener('keydown', function(e) {
         if (e.ctrlKey || e.metaKey) {
           if (e.key === 'b') { e.preventDefault(); wrapSelection('**'); }
           else if (e.key === 'i') { e.preventDefault(); wrapSelection('*'); }
           else if (e.key === 'u') { e.preventDefault(); wrapSelection('__'); }
+        }
+      });
+
+      // Keyboard shortcuts for pretext editor
+      document.getElementById('pretextInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === 'b') { e.preventDefault(); wrapSelectionIn('pretextInput', '**'); }
+          else if (e.key === 'i') { e.preventDefault(); wrapSelectionIn('pretextInput', '*'); }
+          else if (e.key === 'u') { e.preventDefault(); wrapSelectionIn('pretextInput', '__'); }
         }
       });
     }
@@ -593,7 +649,31 @@
       }
     }
 
-    // === MARKDOWN HELPERS ===
+    // === MARKDOWN HELPERS (generic) ===
+    function wrapSelectionIn(textareaId, marker) {
+      const ta = document.getElementById(textareaId);
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const sel = ta.value.substring(start, end);
+      if (!sel.length) return;
+      const wrapped = marker + sel + marker;
+      ta.value = ta.value.substring(0, start) + wrapped + ta.value.substring(end);
+      const np = start + wrapped.length;
+      ta.setSelectionRange(np, np);
+      ta.focus();
+      updatePreview();
+    }
+
+    function insertAtCursorIn(textareaId, text) {
+      const ta = document.getElementById(textareaId);
+      const pos = ta.selectionStart;
+      ta.value = ta.value.substring(0, pos) + text + ta.value.substring(pos);
+      ta.setSelectionRange(pos + text.length, pos + text.length);
+      ta.focus();
+      updatePreview();
+    }
+
+    // === MARKDOWN HELPERS (main editor shortcuts) ===
     function wrapSelection(marker) {
       const ta = document.getElementById('editorInput');
       const start = ta.selectionStart;
@@ -681,16 +761,29 @@
     // === PREVIEW ===
     function updatePreview() {
       const text = document.getElementById('editorInput').value;
+      const pretext = document.getElementById('pretextInput').value;
       const previewEl = document.getElementById('previewText');
 
-      if (!text.trim()) {
+      if (!text.trim() && !pretext.trim()) {
         previewEl.innerHTML = '<p style="color: var(--color-text-subtle);">Gib links einen Text ein &ndash; die Vorschau erscheint hier.</p>';
         return;
       }
 
-      const html = parseMarkdown(text);
-      const clipped = applyClipping(html, currentPreviewVis);
-      previewEl.innerHTML = clipped;
+      let output = '';
+
+      // Vortext (unver\u00e4ndert, kein Clipping)
+      if (pretext.trim()) {
+        output += '<div class="pretext-block" style="margin-bottom:1.5em; padding-bottom:1em; border-bottom:2px solid #ccc;">'
+          + parseMarkdown(pretext) + '</div>';
+      }
+
+      // Lesetext (mit Clipping)
+      if (text.trim()) {
+        const html = parseMarkdown(text);
+        output += applyClipping(html, currentPreviewVis);
+      }
+
+      previewEl.innerHTML = output;
     }
 
     // === PDF GENERATION ===
@@ -745,12 +838,21 @@
 
     async function createPDF(text, visibility, filename) {
       const renderEl = document.getElementById('pdfRender');
+      const pretext = document.getElementById('pretextInput').value;
 
-      // Build content
+      let content = '';
+
+      // Vortext (unver\u00e4ndert)
+      if (pretext.trim()) {
+        content += '<div style="margin-bottom:1.5em; padding-bottom:1em; border-bottom:2px solid #ccc;">'
+          + parseMarkdown(pretext) + '</div>';
+      }
+
+      // Lesetext (geclippt)
       const html = parseMarkdown(text);
-      const clipped = applyClipping(html, visibility);
+      content += applyClipping(html, visibility);
 
-      renderEl.innerHTML = clipped +
+      renderEl.innerHTML = content +
         '<div class="pdf-footer">&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
 
       const opt = {
