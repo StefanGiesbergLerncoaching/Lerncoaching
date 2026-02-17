@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oberl&auml;ngen-Training | Giesberg Diagnostik</title>
+  <link rel="stylesheet" href="../../shared/css/giesberg-design.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* === LAYOUT === */
+    .app-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--space-xl);
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* === EDITOR PANEL === */
+    .editor-panel {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+    }
+
+    .editor-panel h3 {
+      margin-bottom: var(--space-lg);
+    }
+
+    /* Metadata Row */
+    .meta-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* Markdown Textarea */
+    .markdown-editor {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      min-height: 350px;
+      resize: vertical;
+    }
+
+    .markdown-help {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-subtle);
+      margin-top: var(--space-xs);
+    }
+
+    /* Format Toolbar */
+    .format-toolbar {
+      display: flex;
+      gap: 4px;
+      padding: var(--space-sm);
+      background: var(--color-light);
+      border-radius: var(--border-radius);
+      margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .fmt-btn {
+      min-width: 36px;
+      height: 32px;
+      padding: 4px 8px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      background: var(--color-white);
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-primary);
+    }
+
+    .fmt-btn:hover {
+      background: var(--color-light);
+      border-color: var(--color-primary);
+    }
+
+    .fmt-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--color-border);
+      margin: 0 4px;
+    }
+
+    /* === SICHTBARKEITS-PANEL === */
+    .visibility-panel {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+
+    .preset-row {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-lg);
+    }
+
+    .preset-btn {
+      padding: var(--space-xs) var(--space-md);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-white);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      font-family: var(--font-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .preset-btn:hover {
+      border-color: var(--color-primary);
+    }
+
+    .preset-btn.active {
+      background: var(--color-primary);
+      color: var(--color-white);
+      border-color: var(--color-primary);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .vis-checkbox {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+    }
+
+    .vis-checkbox input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .vis-checkbox.checked {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    .custom-value-row {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .custom-value-row input[type="number"] {
+      width: 80px;
+    }
+
+    /* === VORSCHAU PANEL === */
+    .preview-panel {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+      position: sticky;
+      top: var(--space-lg);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .preview-header h3 {
+      margin-bottom: 0;
+    }
+
+    .preview-vis-select {
+      display: flex;
+      gap: var(--space-xs);
+      flex-wrap: wrap;
+    }
+
+    .preview-vis-btn {
+      padding: 2px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: var(--color-white);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-family: var(--font-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .preview-vis-btn:hover {
+      border-color: var(--color-accent);
+    }
+
+    .preview-vis-btn.active {
+      background: var(--color-accent);
+      color: var(--color-white);
+      border-color: var(--color-accent);
+    }
+
+    .preview-text {
+      font-family: 'Arial', sans-serif;
+      font-size: 14pt;
+      line-height: 1.8;
+      color: #000;
+      background: var(--color-light);
+      padding: var(--space-lg);
+      border-radius: var(--border-radius);
+      min-height: 300px;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+
+    .preview-text p {
+      margin-bottom: 0.8em;
+      max-width: none;
+    }
+
+    .preview-text strong { font-weight: 700; }
+    .preview-text em { font-style: italic; }
+    .preview-text u { text-decoration: underline; }
+
+    .clipped-letter {
+      display: inline-block;
+    }
+
+    .preview-footer {
+      margin-top: var(--space-md);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      font-size: 10pt;
+      color: var(--color-text-subtle);
+    }
+
+    /* === PDF ACTION BAR === */
+    .action-bar {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+      margin-top: var(--space-xl);
+    }
+
+    /* === PROGRESS === */
+    .progress-container {
+      display: none;
+      margin-top: var(--space-lg);
+    }
+
+    .progress-container.active {
+      display: block;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: var(--color-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-light);
+      margin-top: var(--space-xs);
+      text-align: center;
+    }
+
+    /* === PDF RENDER (hidden) === */
+    .pdf-render {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 190mm;
+      font-family: 'Arial', sans-serif;
+      font-size: 12pt;
+      line-height: 1.8;
+      color: #000;
+      background: #fff;
+      padding: 0;
+    }
+
+    .pdf-render p {
+      margin-bottom: 0.8em;
+    }
+
+    .pdf-render strong { font-weight: 700; }
+    .pdf-render em { font-style: italic; }
+    .pdf-render u { text-decoration: underline; }
+
+    .pdf-footer {
+      text-align: center;
+      font-size: 10pt;
+      color: #666;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 20px;
+    }
+
+    /* Print */
+    @media print {
+      .g-page-header, .g-footer, .editor-panel,
+      .visibility-panel, .action-bar, .preview-header,
+      .progress-container { display: none !important; }
+      .preview-panel { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="g-page-header">
+    <div class="g-container">
+      <div class="g-page-header__brand">Giesberg Diagnostik</div>
+      <h1>Oberl&auml;ngen-Training</h1>
+      <p>PDF-Generator f&uuml;r Lesetraining mit modifizierbarer Oberl&auml;ngen-Sichtbarkeit</p>
+      <nav class="g-page-header__nav">
+        <a href="../../portal/index.html">&larr; Zur&uuml;ck zum Portal</a>
+        <a href="#" class="active">Oberl&auml;ngen-Training</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-container">
+
+    <div class="app-grid">
+
+      <!-- === LINKE SPALTE: EDITOR === -->
+      <div>
+        <div class="editor-panel">
+          <h3>Text eingeben</h3>
+
+          <!-- Metadaten -->
+          <div class="meta-row">
+            <div class="g-form-group">
+              <label class="g-label">Textname</label>
+              <input type="text" class="g-input" id="textName" placeholder="z.B. Die kleine Maus" value="">
+            </div>
+            <div class="g-form-group">
+              <label class="g-label">Klassenstufe</label>
+              <select class="g-select" id="classLevel">
+                <option value="1-2">Klasse 1-2</option>
+                <option value="3-4">Klasse 3-4</option>
+                <option value="5-6">Klasse 5-6</option>
+                <option value="7-8">Klasse 7-8</option>
+                <option value="9-11">Klasse 9-11</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Format-Toolbar -->
+          <div class="format-toolbar">
+            <button type="button" class="fmt-btn" onclick="wrapSelection('**')" title="Fett (Strg+B)"><strong>B</strong></button>
+            <button type="button" class="fmt-btn" onclick="wrapSelection('*')" title="Kursiv (Strg+I)"><em>I</em></button>
+            <button type="button" class="fmt-btn" onclick="wrapSelection('__')" title="Unterstrichen (Strg+U)"><u>U</u></button>
+            <div class="fmt-divider"></div>
+            <button type="button" class="fmt-btn" onclick="insertAtCursor('\n')" title="Zeilenumbruch">&crarr;</button>
+            <button type="button" class="fmt-btn" onclick="insertAtCursor('\n\n')" title="Neuer Absatz">&para;</button>
+          </div>
+
+          <!-- Markdown Editor -->
+          <textarea class="g-textarea markdown-editor" id="editorInput" placeholder="Text hier eingeben oder einf&uuml;gen...&#10;&#10;Markdown-Formatierung:&#10;**fett**  *kursiv*  __unterstrichen__&#10;&#10;Doppelter Enter = neuer Absatz"></textarea>
+          <div class="markdown-help">
+            Markdown: <code>**fett**</code> &middot; <code>*kursiv*</code> &middot; <code>__unterstrichen__</code> &middot; Doppel-Enter = Absatz
+          </div>
+        </div>
+
+        <!-- === SICHTBARKEIT === -->
+        <div class="visibility-panel">
+          <h3>Sichtbarkeitsstufen f&uuml;r PDF-Export</h3>
+
+          <!-- Presets -->
+          <label class="g-label">Presets</label>
+          <div class="preset-row">
+            <button class="preset-btn active" onclick="applyPreset('standard', this)">Standard (50-80%)</button>
+            <button class="preset-btn" onclick="applyPreset('alle', this)">Alle (20-90%)</button>
+            <button class="preset-btn" onclick="applyPreset('leicht', this)">Leicht (70-90%)</button>
+            <button class="preset-btn" onclick="applyPreset('schwer', this)">Schwer (20-50%)</button>
+            <button class="preset-btn" onclick="applyPreset('keine', this)">Keine</button>
+          </div>
+
+          <!-- Checkboxen -->
+          <label class="g-label">Einzelne Stufen</label>
+          <div class="checkbox-grid" id="visCheckboxes"></div>
+
+          <!-- Eigener Wert -->
+          <div class="custom-value-row">
+            <label class="g-label" style="margin-bottom: 0;">Eigener Wert:</label>
+            <input type="number" class="g-input" id="customValue" min="10" max="95" step="5" placeholder="%">
+            <button class="g-btn g-btn--outline g-btn--sm" onclick="addCustomValue()">Hinzuf&uuml;gen</button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-bar">
+            <button class="g-btn g-btn--primary g-btn--lg" onclick="generateAllPDFs()">
+              PDFs erstellen
+            </button>
+            <button class="g-btn g-btn--secondary" onclick="generateSinglePDF()">
+              Nur aktuelle Vorschau als PDF
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-label" id="progressLabel">Erstelle PDFs...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- === RECHTE SPALTE: VORSCHAU === -->
+      <div>
+        <div class="preview-panel">
+          <div class="preview-header">
+            <h3>Vorschau</h3>
+            <div class="preview-vis-select" id="previewVisSelect"></div>
+          </div>
+          <div class="preview-text" id="previewText">
+            <p style="color: var(--color-text-subtle);">Gib links einen Text ein &ndash; die Vorschau erscheint hier.</p>
+          </div>
+          <div class="preview-footer">
+            &copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- PDF Render Container (offscreen) -->
+  <div class="pdf-render" id="pdfRender"></div>
+
+  <!-- Footer -->
+  <footer class="g-footer g-no-print">
+    <div class="g-container">
+      <p>&copy; 2026 Stefan Giesberg | <a href="../../portal/index.html">Zur&uuml;ck zum Portal</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // =============================================
+    // OBERL&Auml;NGEN-TRAINING - PDF-GENERATOR
+    // =============================================
+
+    // === CONSTANTS ===
+    const UPPER_LETTERS = new Set(['b','d','f','h','k','l','t','B','D','F','H','K','L','T']);
+    const ALL_STEPS = [20,25,30,35,40,45,50,55,60,65,70,75,80,85,90];
+
+    const PRESETS = {
+      standard: [50,55,60,70,80],
+      alle: ALL_STEPS,
+      leicht: [70,75,80,85,90],
+      schwer: [20,25,30,35,40,45,50],
+      keine: []
+    };
+
+    // === STATE ===
+    let currentPreviewVis = 60;
+    let selectedVisibilities = new Set(PRESETS.standard);
+
+    // === INIT ===
+    function init() {
+      renderCheckboxes();
+      renderPreviewButtons();
+      updatePreview();
+
+      // Live-Update
+      document.getElementById('editorInput').addEventListener('input', updatePreview);
+
+      // Keyboard shortcuts
+      document.getElementById('editorInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === 'b') { e.preventDefault(); wrapSelection('**'); }
+          else if (e.key === 'i') { e.preventDefault(); wrapSelection('*'); }
+          else if (e.key === 'u') { e.preventDefault(); wrapSelection('__'); }
+        }
+      });
+    }
+
+    // === CHECKBOX RENDERING ===
+    function renderCheckboxes() {
+      const container = document.getElementById('visCheckboxes');
+      container.innerHTML = '';
+      ALL_STEPS.forEach(v => {
+        const checked = selectedVisibilities.has(v);
+        const label = document.createElement('label');
+        label.className = 'vis-checkbox' + (checked ? ' checked' : '');
+        label.innerHTML = `<input type="checkbox" value="${v}" ${checked ? 'checked' : ''} onchange="toggleVisibility(${v}, this)"> ${v}%`;
+        container.appendChild(label);
+      });
+    }
+
+    function renderPreviewButtons() {
+      const container = document.getElementById('previewVisSelect');
+      const values = selectedVisibilities.size > 0
+        ? [...selectedVisibilities].sort((a,b) => a-b)
+        : [50, 60, 70, 80];
+
+      container.innerHTML = '';
+      values.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'preview-vis-btn' + (v === currentPreviewVis ? ' active' : '');
+        btn.textContent = v + '%';
+        btn.onclick = () => { currentPreviewVis = v; renderPreviewButtons(); updatePreview(); };
+        container.appendChild(btn);
+      });
+
+      // Ensure current preview vis is in range
+      if (!values.includes(currentPreviewVis) && values.length > 0) {
+        currentPreviewVis = values[Math.floor(values.length / 2)];
+        renderPreviewButtons();
+      }
+    }
+
+    // === PRESETS ===
+    function applyPreset(name, btn) {
+      selectedVisibilities = new Set(PRESETS[name]);
+      // UI feedback
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCheckboxes();
+      renderPreviewButtons();
+      updatePreview();
+    }
+
+    function toggleVisibility(value, checkbox) {
+      if (checkbox.checked) {
+        selectedVisibilities.add(value);
+      } else {
+        selectedVisibilities.delete(value);
+      }
+      checkbox.parentElement.classList.toggle('checked', checkbox.checked);
+      // Deactivate preset buttons
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      renderPreviewButtons();
+    }
+
+    function addCustomValue() {
+      const input = document.getElementById('customValue');
+      const val = parseInt(input.value);
+      if (val >= 10 && val <= 95) {
+        selectedVisibilities.add(val);
+        // If not in standard steps, we still add it
+        if (!ALL_STEPS.includes(val)) {
+          ALL_STEPS.push(val);
+          ALL_STEPS.sort((a,b) => a-b);
+        }
+        renderCheckboxes();
+        renderPreviewButtons();
+        input.value = '';
+      }
+    }
+
+    // === MARKDOWN HELPERS ===
+    function wrapSelection(marker) {
+      const ta = document.getElementById('editorInput');
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const sel = ta.value.substring(start, end);
+      if (!sel.length) return;
+      const wrapped = marker + sel + marker;
+      ta.value = ta.value.substring(0, start) + wrapped + ta.value.substring(end);
+      const np = start + wrapped.length;
+      ta.setSelectionRange(np, np);
+      ta.focus();
+      updatePreview();
+    }
+
+    function insertAtCursor(text) {
+      const ta = document.getElementById('editorInput');
+      const pos = ta.selectionStart;
+      ta.value = ta.value.substring(0, pos) + text + ta.value.substring(pos);
+      ta.setSelectionRange(pos + text.length, pos + text.length);
+      ta.focus();
+      updatePreview();
+    }
+
+    // === MARKDOWN PARSER ===
+    function parseMarkdown(text) {
+      // Paragraphs
+      let html = text.replace(/\n\n+/g, '</p><p>');
+      // Line breaks
+      html = html.replace(/\n/g, '<br>');
+      // Bold+Italic
+      html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+      // Bold
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Italic
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      // Underline
+      html = html.replace(/__(.*?)__/g, '<u>$1</u>');
+      return '<p>' + html + '</p>';
+    }
+
+    // === OBERLAENGEN CLIPPING ===
+    function applyClipping(html, visibility) {
+      // Parse HTML, then process text nodes to clip upper-length letters
+      const container = document.createElement('div');
+      container.innerHTML = html;
+
+      const clipValue = 100 - visibility; // e.g. 60% visible -> clip 40% from top
+
+      function processNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          if (!text.trim()) return;
+
+          const fragment = document.createDocumentFragment();
+          for (let i = 0; i < text.length; i++) {
+            const ch = text[i];
+            if (UPPER_LETTERS.has(ch)) {
+              const span = document.createElement('span');
+              span.className = 'clipped-letter';
+              span.style.clipPath = `inset(${clipValue}% 0 0 0)`;
+              span.textContent = ch;
+              fragment.appendChild(span);
+            } else {
+              // Accumulate non-clipped chars
+              const lastChild = fragment.lastChild;
+              if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
+                lastChild.textContent += ch;
+              } else {
+                fragment.appendChild(document.createTextNode(ch));
+              }
+            }
+          }
+          node.parentNode.replaceChild(fragment, node);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // Process children (iterate backwards to handle DOM changes)
+          const children = Array.from(node.childNodes);
+          children.forEach(child => processNode(child));
+        }
+      }
+
+      processNode(container);
+      return container.innerHTML;
+    }
+
+    // === PREVIEW ===
+    function updatePreview() {
+      const text = document.getElementById('editorInput').value;
+      const previewEl = document.getElementById('previewText');
+
+      if (!text.trim()) {
+        previewEl.innerHTML = '<p style="color: var(--color-text-subtle);">Gib links einen Text ein &ndash; die Vorschau erscheint hier.</p>';
+        return;
+      }
+
+      const html = parseMarkdown(text);
+      const clipped = applyClipping(html, currentPreviewVis);
+      previewEl.innerHTML = clipped;
+    }
+
+    // === PDF GENERATION ===
+    async function generateSinglePDF() {
+      const text = document.getElementById('editorInput').value;
+      if (!text.trim()) { alert('Bitte zuerst einen Text eingeben.'); return; }
+
+      const name = document.getElementById('textName').value || 'Text';
+      const klasse = document.getElementById('classLevel').value;
+      const filename = `Klasse${klasse}_${sanitizeFilename(name)}_${currentPreviewVis}%.pdf`;
+
+      await createPDF(text, currentPreviewVis, filename);
+    }
+
+    async function generateAllPDFs() {
+      const text = document.getElementById('editorInput').value;
+      if (!text.trim()) { alert('Bitte zuerst einen Text eingeben.'); return; }
+
+      const visibilities = [...selectedVisibilities].sort((a,b) => a-b);
+      if (visibilities.length === 0) { alert('Bitte mindestens eine Sichtbarkeitsstufe ausw\u00e4hlen.'); return; }
+
+      const name = document.getElementById('textName').value || 'Text';
+      const klasse = document.getElementById('classLevel').value;
+
+      // Show progress
+      const progressContainer = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      progressContainer.classList.add('active');
+
+      for (let i = 0; i < visibilities.length; i++) {
+        const vis = visibilities[i];
+        const filename = `Klasse${klasse}_${sanitizeFilename(name)}_${vis}%.pdf`;
+
+        progressLabel.textContent = `Erstelle PDF ${i + 1} von ${visibilities.length}: ${vis}% Sichtbarkeit...`;
+        progressFill.style.width = ((i / visibilities.length) * 100) + '%';
+
+        await createPDF(text, vis, filename);
+
+        // Small delay between PDFs to avoid browser blocking downloads
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      progressFill.style.width = '100%';
+      progressLabel.textContent = `Fertig! ${visibilities.length} PDFs erstellt.`;
+
+      setTimeout(() => {
+        progressContainer.classList.remove('active');
+        progressFill.style.width = '0%';
+      }, 3000);
+    }
+
+    async function createPDF(text, visibility, filename) {
+      const renderEl = document.getElementById('pdfRender');
+
+      // Build content
+      const html = parseMarkdown(text);
+      const clipped = applyClipping(html, visibility);
+
+      renderEl.innerHTML = clipped +
+        '<div class="pdf-footer">&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
+
+      const opt = {
+        margin: 10,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      await html2pdf().set(opt).from(renderEl).save();
+    }
+
+    // === UTILS ===
+    function sanitizeFilename(name) {
+      return name
+        .replace(/\s+/g, '')
+        .replace(/[^a-zA-Z0-9\u00C0-\u024F\-_]/g, '')
+        .substring(0, 50);
+    }
+
+    // === START ===
+    init();
+  </script>
+
+</body>
+</html>
