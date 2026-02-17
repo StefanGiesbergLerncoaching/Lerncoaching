@@ -131,6 +131,101 @@
       margin: 0 4px;
     }
 
+    /* === BUCHSTABEN-PANEL === */
+    .letter-panel {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-xl);
+      margin-top: var(--space-xl);
+      border-left: 4px solid var(--color-accent);
+    }
+
+    .letter-panel h3 {
+      margin-bottom: var(--space-lg);
+      color: var(--color-accent);
+    }
+
+    .replacement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .replacement-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: var(--font-mono);
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-light);
+      transition: all var(--transition-fast);
+    }
+
+    .replacement-item:hover {
+      border-color: var(--color-accent);
+    }
+
+    .replacement-item input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-accent);
+      cursor: pointer;
+    }
+
+    .custom-replacements {
+      margin-bottom: var(--space-lg);
+    }
+
+    .custom-replacement-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .custom-replacement-row input[type="text"] {
+      width: 60px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .custom-replacement-row .arrow {
+      color: var(--color-text-subtle);
+      font-weight: 600;
+    }
+
+    .shuffle-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: var(--color-light);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+    }
+
+    .shuffle-toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-accent);
+      cursor: pointer;
+    }
+
+    .shuffle-toggle label {
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+    }
+
     /* === SICHTBARKEITS-PANEL === */
     .visibility-panel {
       background: var(--color-white);
@@ -368,8 +463,8 @@
 
     /* Print */
     @media print {
-      .g-page-header, .g-footer, .editor-panel,
-      .visibility-panel, .action-bar, .preview-header,
+      .g-page-header, .g-footer, .editor-panel, .pretext-panel,
+      .letter-panel, .visibility-panel, .action-bar, .preview-header,
       .progress-container { display: none !important; }
       .preview-panel { box-shadow: none; }
     }
@@ -448,6 +543,46 @@
           <textarea class="g-textarea markdown-editor" id="editorInput" placeholder="Text hier eingeben oder einf&uuml;gen...&#10;&#10;Markdown-Formatierung:&#10;**fett**  *kursiv*  __unterstrichen__&#10;&#10;Doppelter Enter = neuer Absatz"></textarea>
           <div class="markdown-help">
             Markdown: <code>**fett**</code> &middot; <code>*kursiv*</code> &middot; <code>__unterstrichen__</code> &middot; Doppel-Enter = Absatz
+          </div>
+        </div>
+
+        <!-- === BUCHSTABEN-ERSETZUNG & MISCHEN === -->
+        <div class="letter-panel">
+          <h3>Buchstaben-Ersetzung &amp; Mischen</h3>
+
+          <!-- Standard-Ersetzungen -->
+          <label class="g-label">Leetspeak-Ersetzungen</label>
+          <div class="replacement-grid">
+            <label class="replacement-item"><input type="checkbox" id="replace_e" class="replace-checkbox"> e &rarr; 3</label>
+            <label class="replacement-item"><input type="checkbox" id="replace_a" class="replace-checkbox"> a &rarr; 4</label>
+            <label class="replacement-item"><input type="checkbox" id="replace_i" class="replace-checkbox"> i &rarr; 1</label>
+            <label class="replacement-item"><input type="checkbox" id="replace_o" class="replace-checkbox"> o &rarr; 0</label>
+            <label class="replacement-item"><input type="checkbox" id="replace_s" class="replace-checkbox"> s &rarr; 5</label>
+            <label class="replacement-item"><input type="checkbox" id="replace_t" class="replace-checkbox"> t &rarr; 7</label>
+          </div>
+
+          <!-- Eigene Ersetzungen -->
+          <label class="g-label">Eigene Ersetzungen</label>
+          <div class="custom-replacements">
+            <div class="custom-replacement-row">
+              <input type="checkbox" id="custom_active_1" class="replace-checkbox" title="Aktivieren">
+              <input type="text" class="g-input" id="custom_from_1" maxlength="3" placeholder="von">
+              <span class="arrow">&rarr;</span>
+              <input type="text" class="g-input" id="custom_to_1" maxlength="3" placeholder="zu">
+            </div>
+            <div class="custom-replacement-row">
+              <input type="checkbox" id="custom_active_2" class="replace-checkbox" title="Aktivieren">
+              <input type="text" class="g-input" id="custom_from_2" maxlength="3" placeholder="von">
+              <span class="arrow">&rarr;</span>
+              <input type="text" class="g-input" id="custom_to_2" maxlength="3" placeholder="zu">
+            </div>
+          </div>
+
+          <!-- Buchstaben mischen -->
+          <label class="g-label">Buchstaben-Mischung</label>
+          <div class="shuffle-toggle">
+            <input type="checkbox" id="shuffleToggle">
+            <label for="shuffleToggle">Buchstaben im Wort mischen (erster und letzter bleiben fix)</label>
           </div>
         </div>
 
@@ -555,6 +690,17 @@
       // Live-Update for both editors
       document.getElementById('editorInput').addEventListener('input', updatePreview);
       document.getElementById('pretextInput').addEventListener('input', updatePreview);
+
+      // Live-Update for replacement checkboxes and shuffle
+      document.querySelectorAll('.replace-checkbox').forEach(cb => {
+        cb.addEventListener('change', updatePreview);
+      });
+      document.getElementById('shuffleToggle').addEventListener('change', updatePreview);
+
+      // Live-Update for custom replacement text inputs
+      ['custom_from_1','custom_to_1','custom_from_2','custom_to_2'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreview);
+      });
 
       // Keyboard shortcuts for main editor
       document.getElementById('editorInput').addEventListener('keydown', function(e) {
@@ -697,6 +843,58 @@
       updatePreview();
     }
 
+    // === BUCHSTABEN-ERSETZUNG ===
+    function applyReplacementsToText(text) {
+      let r = text;
+      if (document.getElementById('replace_e').checked) r = r.replace(/e/gi, '3');
+      if (document.getElementById('replace_a').checked) r = r.replace(/a/gi, '4');
+      if (document.getElementById('replace_i').checked) r = r.replace(/i/gi, '1');
+      if (document.getElementById('replace_o').checked) r = r.replace(/o/gi, '0');
+      if (document.getElementById('replace_s').checked) r = r.replace(/s/gi, '5');
+      if (document.getElementById('replace_t').checked) r = r.replace(/t/gi, '7');
+      // Custom replacements
+      [1, 2].forEach(n => {
+        if (document.getElementById('custom_active_' + n).checked) {
+          const from = document.getElementById('custom_from_' + n).value;
+          const to = document.getElementById('custom_to_' + n).value;
+          if (from && to) {
+            r = r.replace(new RegExp(escapeRegExp(from), 'gi'), to);
+          }
+        }
+      });
+      return r;
+    }
+
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // === BUCHSTABEN MISCHEN (Fisher-Yates) ===
+    function scrambleWord(word) {
+      if (word.length <= 3) return word;
+      const first = word[0];
+      const last = word[word.length - 1];
+      const mid = word.slice(1, -1).split('');
+      for (let i = mid.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [mid[i], mid[j]] = [mid[j], mid[i]];
+      }
+      return first + mid.join('') + last;
+    }
+
+    function applyShuffleToText(text) {
+      if (!document.getElementById('shuffleToggle').checked) return text;
+      // Only shuffle actual words (keep markdown markers and non-word chars intact)
+      return text.replace(/[a-zA-ZäöüÄÖÜß]+/g, match => scrambleWord(match));
+    }
+
+    // === TEXT TRANSFORMATIONS (Replacements + Shuffle on plain text) ===
+    function applyTextTransforms(text) {
+      let result = applyReplacementsToText(text);
+      result = applyShuffleToText(result);
+      return result;
+    }
+
     // === MARKDOWN PARSER ===
     function parseMarkdown(text) {
       // Paragraphs
@@ -777,9 +975,10 @@
           + parseMarkdown(pretext) + '</div>';
       }
 
-      // Lesetext (mit Clipping)
+      // Lesetext (mit Ersetzungen, Mischen und Clipping)
       if (text.trim()) {
-        const html = parseMarkdown(text);
+        const transformedText = applyTextTransforms(text);
+        const html = parseMarkdown(transformedText);
         output += applyClipping(html, currentPreviewVis);
       }
 
@@ -848,8 +1047,9 @@
           + parseMarkdown(pretext) + '</div>';
       }
 
-      // Lesetext (geclippt)
-      const html = parseMarkdown(text);
+      // Lesetext (mit Ersetzungen, Mischen und Clipping)
+      const transformedText = applyTextTransforms(text);
+      const html = parseMarkdown(transformedText);
       content += applyClipping(html, visibility);
 
       renderEl.innerHTML = content +
