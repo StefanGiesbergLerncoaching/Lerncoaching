@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Stefan Giesberg - Lerncoach für hochbegabte Kinder. Ich kenne beide Seiten: Lehrer und Coach.">
-  <title>Über mich - Stefan Giesberg Lerncoaching</title>
+  <meta name="description" content="Stefan Giesberg – Lerncoach für hochbegabte Kinder. ECHA-Diplom, Diplomsportlehrer, Mitautor von 'Plötzlich Hochbegabt'.">
+  <title>Über mich – Stefan Giesberg Lerncoaching</title>
   <link rel="stylesheet" href="../shared/css/giesberg-design.css">
+  <link rel="stylesheet" href="assets/css/website.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -16,22 +17,59 @@
     }
 
     .about-hero h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(1.8rem, 4.5vw, 2.8rem);
       color: var(--color-primary);
       margin-bottom: var(--space-md);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.25;
     }
 
     .about-hero p {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--color-text-light);
-      max-width: 700px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
-    .about-content {
-      max-width: 800px;
+    .about-layout {
+      max-width: 1000px;
       margin: 0 auto;
       padding: calc(var(--space-xl) * 2) var(--space-xl);
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: calc(var(--space-xl) * 2);
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .about-layout {
+        grid-template-columns: 1fr;
+      }
+      .about-sidebar {
+        text-align: center;
+      }
+    }
+
+    .about-sidebar .photo-placeholder {
+      margin: 0 auto var(--space-lg);
+    }
+
+    .sidebar-book {
+      background: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--color-accent);
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+
+    .sidebar-book strong {
+      display: block;
+      color: var(--color-primary);
+      margin-bottom: 4px;
     }
 
     .about-section {
@@ -39,7 +77,7 @@
     }
 
     .about-section h2 {
-      font-size: 1.8rem;
+      font-size: 1.7rem;
       color: var(--color-primary);
       margin-bottom: var(--space-md);
       border-left: 4px solid var(--color-accent);
@@ -47,33 +85,55 @@
     }
 
     .about-section p {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: var(--color-text-light);
-      margin-bottom: var(--space-md);
-    }
-
-    .about-section ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .about-section ul li {
       font-size: 1.05rem;
       line-height: 1.8;
       color: var(--color-text-light);
-      padding-left: var(--space-lg);
-      margin-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+      max-width: none;
+    }
+
+    .qual-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .qual-list li {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      padding: var(--space-sm) 0 var(--space-sm) 2rem;
+      border-bottom: 1px solid var(--color-border);
       position: relative;
     }
 
-    .about-section ul li:before {
+    .qual-list li:last-child {
+      border-bottom: none;
+    }
+
+    .qual-list li::before {
       content: "✓";
       position: absolute;
       left: 0;
       color: var(--color-accent);
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+    }
+
+    .qual-list li strong {
+      color: var(--color-primary);
+      display: block;
+    }
+
+    .about-highlight {
+      background: var(--color-accent-light, #FDF2E0);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-md) 0;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--color-text);
+      border-left: 4px solid var(--color-accent);
     }
 
     .cta-box {
@@ -81,18 +141,19 @@
       border-radius: var(--border-radius-lg);
       padding: var(--space-xl);
       text-align: center;
-      margin-top: calc(var(--space-xl) * 2);
+      margin-top: var(--space-xl);
     }
 
     .cta-box h3 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--color-primary);
       margin-bottom: var(--space-md);
     }
 
     .cta-box p {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       margin-bottom: var(--space-lg);
+      max-width: none;
     }
   </style>
 </head>
@@ -101,56 +162,107 @@
   <!-- Header -->
   <header class="g-page-header">
     <div class="g-container">
-      <div class="g-page-header__brand">Stefan Giesberg Lerncoaching</div>
+      <a href="index.html" class="g-page-header__brand-wrapper">
+        <svg class="g-page-header__logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M20 34C20 34 5 24 5 13.5C5 9.36 8.58 6 12.75 6C15.6 6 18.1 7.55 19.5 9.85L20 10.7L20.5 9.85C21.9 7.55 24.4 6 27.25 6C31.42 6 35 9.36 35 13.5C35 24 20 34 20 34Z" fill="#F39C12"/>
+        </svg>
+        <span class="g-page-header__brand">Stefan Giesberg Lerncoaching</span>
+      </a>
       <nav class="g-page-header__nav">
         <a href="index.html">Home</a>
         <a href="about.html" class="active">Über mich</a>
         <a href="testimonials.html">Erfahrungsberichte</a>
         <a href="contact.html">Kontakt</a>
-        <a href="../portal/index.html">Tools</a>
       </nav>
     </div>
   </header>
 
   <!-- Hero -->
   <section class="about-hero">
-    <h1>Hallo, ich bin Stefan Giesberg – und kenne beide Seiten</h1>
-    <p>Als Lehrer und Lerncoach verstehe ich die Herausforderungen hochbegabter Kinder aus zwei Perspektiven.</p>
+    <h1>Hallo, ich bin Stefan Giesberg –<br>ich kenne beide Seiten</h1>
+    <p>Als Lehrer, Lerncoach und selbst spät entdeckter Hochbegabter verstehe ich die Herausforderungen aus eigener Erfahrung.</p>
   </section>
 
   <!-- Content -->
-  <main class="about-content">
-    <div class="about-section">
-      <h2>Mein Hintergrund</h2>
-      <p>Seit vielen Jahren arbeite ich mit hochbegabten Kindern, die trotz ihrer Intelligenz im Schulalltag an Grenzen stoßen. Als Lehrer habe ich erlebt, wie frustrierend es für diese Kinder sein kann, wenn sie zwar verstehen, aber nicht effizient arbeiten können.</p>
-      <p>Diese Erfahrung hat mich motiviert, mich auf Lerncoaching zu spezialisieren – mit dem Fokus darauf, ineffiziente Lerntechniken zu identifizieren und durch bessere zu ersetzen.</p>
-    </div>
+  <main>
+    <div class="about-layout">
 
-    <div class="about-section">
-      <h2>Meine Qualifikationen</h2>
-      <ul>
-        <li>Staatsexamen für das Lehramt an Gymnasien</li>
-        <li>Langjährige Erfahrung im Unterrichten hochbegabter Schüler</li>
-        <li>Spezialisierung auf Lerndiagnostik und Lerntechnik-Coaching</li>
-        <li>Entwicklung eigener Diagnostik-Tools für Lesetechniken</li>
-      </ul>
-    </div>
+      <!-- Sidebar: Foto + Buch -->
+      <div class="about-sidebar">
+        <div class="photo-placeholder">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <p>Foto folgt</p>
+        </div>
 
-    <div class="about-section">
-      <h2>Mein Ansatz</h2>
-      <p>Mein Ziel ist es nicht, Ihr Kind härter arbeiten zu lassen – sondern <strong>smarter</strong>. Viele hochbegabte Kinder nutzen Lerntechniken, die zwar funktionieren, aber viel zu viel Energie kosten.</p>
-      <p>In meinem Coaching finden wir heraus, wo genau die Blockade liegt, und ersetzen die "Dreirad"-Technik durch eine effiziente "Fahrrad"-Technik. Oft reicht bereits eine Sitzung, um den entscheidenden Durchbruch zu erzielen.</p>
-    </div>
+        <div class="sidebar-book">
+          <strong>📖 Mitautor</strong>
+          „Plötzlich Hochbegabt"<br>
+          <span style="font-size: 0.8rem; opacity: 0.8;">Goldmann Verlag</span>
+        </div>
+      </div>
 
-    <div class="about-section">
-      <h2>Was mich antreibt</h2>
-      <p>Es gibt kaum etwas Befriedigenderes, als zu sehen, wie ein Kind, das sich vorher durch jede Hausaufgabe gequält hat, plötzlich aufblüht – weil es die richtige Technik gefunden hat. Diese Momente sind der Grund, warum ich diese Arbeit liebe.</p>
-    </div>
+      <!-- Main Content -->
+      <div class="about-main">
 
-    <div class="cta-box">
-      <h3>Lassen Sie uns sprechen</h3>
-      <p>Sie möchten mehr erfahren oder haben Fragen? Vereinbaren Sie ein kostenloses Erstgespräch.</p>
-      <a href="contact.html" class="g-btn g-btn--primary g-btn--lg">Jetzt Kontakt aufnehmen</a>
+        <div class="about-section">
+          <h2>Mein Hintergrund</h2>
+          <p>Jahrelang habe ich als Diplomsportlehrer und Gesamtschullehrer (Sport & Mathematik) gearbeitet – und dabei erlebt, wie frustrierend es für hochbegabte Kinder sein kann, wenn ihre Intelligenz und ihre schulischen Leistungen auseinanderklaffen.</p>
+          <p>Das Entscheidende kam für mich mit 48: Ich entdeckte, dass ich selbst hochbegabt bin. Dieser Perspektivwechsel hat meine Arbeit komplett verändert. Ich verstehe jetzt aus eigener Erfahrung, was in diesen Kindern vorgeht – und warum die üblichen Lernmethoden bei ihnen nicht greifen.</p>
+          <div class="about-highlight">
+            „Als Vater zweier hochbegabter Kinder und als Betroffener selbst bringe ich eine Perspektive mit, die kein Lehrbuch vermitteln kann."
+          </div>
+        </div>
+
+        <div class="about-section">
+          <h2>Meine Qualifikationen</h2>
+          <ul class="qual-list">
+            <li>
+              <strong>ECHA-Diplom (European Council for High Ability)</strong>
+              Universität Münster – internationale Spezialisierung auf Hochbegabtenförderung
+            </li>
+            <li>
+              <strong>Diplomsportlehrer</strong>
+              Fundiertes Wissen über Lern- und Bewegungsprozesse
+            </li>
+            <li>
+              <strong>Gesamtschullehrer Sport &amp; Mathematik</strong>
+              Langjährige Unterrichtserfahrung mit heterogenen Lerngruppen
+            </li>
+            <li>
+              <strong>ZRM-zertifiziert</strong>
+              Zürcher Ressourcen Modell – wissenschaftlich fundiertes Coaching-Verfahren
+            </li>
+            <li>
+              <strong>Ausbildung im Netzwerk Frauke Niehues</strong>
+              Spezialisierung auf Hochbegabtendiagnostik und -begleitung
+            </li>
+            <li>
+              <strong>Mitautor: „Plötzlich Hochbegabt"</strong>
+              Goldmann Verlag – Praxisbuch für Eltern hochbegabter Kinder
+            </li>
+          </ul>
+        </div>
+
+        <div class="about-section">
+          <h2>Mein Ansatz</h2>
+          <p>Mein Ziel ist nicht, Ihr Kind härter arbeiten zu lassen – sondern <strong>smarter</strong>. Hochbegabte Kinder nutzen oft Lerntechniken, die zwar irgendwie funktionieren, aber enorm viel Energie kosten. Das äußert sich in unleserlicher Schrift, Buchstabenverdrehungen, Abbrüchen – obwohl die Intelligenz da ist.</p>
+          <p>In der Diagnostik (per Videokonferenz) finde ich heraus, wo genau die Blockade liegt. Ich entschlüssele die individuelle Vorgehensweise des Kindes und ersetze dann gemeinsam die „Dreirad"-Technik durch eine effiziente „Fahrrad"-Technik. Oft reicht eine Sitzung, um den entscheidenden Durchbruch zu erzielen.</p>
+        </div>
+
+        <div class="about-section">
+          <h2>Was mich antreibt</h2>
+          <p>Es gibt kaum etwas Befriedigenderes, als zu sehen, wie ein Kind, das sich vorher durch jede Hausaufgabe gequält hat, plötzlich aufblüht – weil es die richtige Technik gefunden hat. Diese Momente sind der Grund, warum ich diese Arbeit liebe.</p>
+        </div>
+
+        <div class="cta-box">
+          <h3>Lassen Sie uns sprechen</h3>
+          <p>Sie möchten mehr erfahren oder haben Fragen? Das erste Gespräch ist kostenlos und unverbindlich.</p>
+          <a href="contact.html" class="g-btn g-btn--primary g-btn--lg">Jetzt Kontakt aufnehmen</a>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -160,15 +272,14 @@
       <div class="g-footer__content">
         <div class="g-footer__section">
           <h3>Stefan Giesberg Lerncoaching</h3>
-          <p>Spezialisiert auf hochbegabte Kinder mit Lernblockaden</p>
+          <p>Spezialisiert auf hochbegabte Kinder mit Lese- und Schreibblockaden – Quick-Fix statt jahrelanger Therapie.</p>
         </div>
         <div class="g-footer__section">
           <h4>Navigation</h4>
           <a href="index.html">Home</a>
           <a href="about.html">Über mich</a>
           <a href="testimonials.html">Erfahrungsberichte</a>
-        <a href="contact.html">Kontakt</a>
-          <a href="../portal/index.html">Tools</a>
+          <a href="contact.html">Kontakt</a>
         </div>
         <div class="g-footer__section">
           <h4>Rechtliches</h4>
@@ -177,7 +288,7 @@
         </div>
       </div>
       <div class="g-footer__bottom">
-        <p>&copy; 2026 Stefan Giesberg Lerncoaching | <a href="mailto:stefdan@stefangiesberg.de">stefdan@stefangiesberg.de</a></p>
+        <p>&copy; 2026 Stefan Giesberg Lerncoaching | <a href="mailto:stefan@stefangiesberg.de">stefan@stefangiesberg.de</a></p>
       </div>
     </div>
   </footer>

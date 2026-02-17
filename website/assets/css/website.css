@@ -1,0 +1,261 @@
+/* ============================================================
+   STEFAN GIESBERG LERNCOACHING – Website-spezifische Styles
+   Wird zusätzlich zu giesberg-design.css geladen (nur /website/)
+   ============================================================ */
+
+/* =================================================================
+   HEADER – Horizontale Ein-Zeilen-Navigation
+   ================================================================= */
+
+.g-page-header {
+  padding: var(--space-md) 0;
+}
+
+.g-page-header .g-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+/* Logo + Brand-Text als klickbarer Link */
+.g-page-header__brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none !important;
+  flex-shrink: 0;
+}
+
+.g-page-header__brand-wrapper:hover {
+  text-decoration: none !important;
+}
+
+.g-page-header__logo {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.g-page-header__brand {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: var(--color-white) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  margin-bottom: 0 !important;
+  opacity: 1 !important;
+  white-space: nowrap;
+}
+
+/* Navigation (rechts) */
+.g-page-header__nav {
+  margin-top: 0 !important;
+  flex-shrink: 0;
+}
+
+.g-page-header__nav a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.95rem !important;
+  font-weight: 500;
+}
+
+.g-page-header__nav a:hover,
+.g-page-header__nav a.active {
+  color: var(--color-white) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+@media (max-width: 768px) {
+  .g-page-header .g-container {
+    gap: var(--space-sm);
+  }
+  .g-page-header__brand {
+    font-size: 0.95rem !important;
+  }
+  .g-page-header__nav {
+    flex-wrap: wrap;
+  }
+}
+
+/* =================================================================
+   FOOTER – Dreispaltiges Grid-Layout
+   ================================================================= */
+
+.g-footer {
+  text-align: left;
+  margin-top: 0;
+}
+
+.g-footer__content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--space-lg);
+  text-align: left;
+}
+
+.g-footer__section h3 {
+  color: var(--color-white) !important;
+  font-size: 1rem;
+  margin-bottom: var(--space-sm);
+}
+
+.g-footer__section h4 {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-sm);
+}
+
+.g-footer__section p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: none;
+}
+
+.g-footer__section a {
+  display: block;
+  color: rgba(255, 255, 255, 0.6) !important;
+  margin-bottom: 5px;
+  font-size: 0.875rem;
+  text-decoration: none !important;
+}
+
+.g-footer__section a:hover {
+  color: var(--color-accent) !important;
+}
+
+.g-footer__bottom {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.g-footer__bottom a {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.g-footer__bottom a:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .g-footer__content {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
+
+/* =================================================================
+   TESTIMONIALS – Anführungszeichen neu gestaltet (small-caps Label)
+   ================================================================= */
+
+.testimonial-card {
+  padding-top: calc(var(--space-xl) + 1.5rem);
+}
+
+.testimonial-card::before {
+  content: 'Erfahrungsbericht';
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-xl);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  font-family: var(--font-primary, sans-serif);
+  font-style: normal;
+  opacity: 0.85;
+  line-height: 1;
+}
+
+/* =================================================================
+   BILD-PLATZHALTER (bis echte Fotos hochgeladen werden)
+   ================================================================= */
+
+.img-placeholder {
+  background: linear-gradient(135deg, #dde4ea 0%, #c8d3dd 100%);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  min-height: 280px;
+  color: var(--color-text-subtle);
+  text-align: center;
+  gap: var(--space-md);
+  border: 2px dashed rgba(45, 64, 89, 0.2);
+}
+
+.img-placeholder p {
+  font-size: 0.875rem;
+  color: var(--color-text-subtle);
+  max-width: none;
+  margin: 0;
+  font-style: italic;
+}
+
+.photo-placeholder {
+  width: 220px;
+  height: 270px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-xl);
+  color: rgba(255, 255, 255, 0.6);
+  gap: var(--space-sm);
+}
+
+.photo-placeholder p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-style: italic;
+  max-width: none;
+}
+
+/* =================================================================
+   KONZEPT-VERGLEICHSTABELLE
+   ================================================================= */
+
+.konzept-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-md);
+  font-size: 0.95rem;
+}
+
+.konzept-table tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.konzept-table tr:last-child {
+  border-bottom: none;
+}
+
+.konzept-table td {
+  padding: var(--space-sm) var(--space-md);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.konzept-table td:first-child {
+  font-weight: 600;
+  color: var(--color-primary);
+  width: 35%;
+  white-space: nowrap;
+}
+
+.konzept-table td:last-child {
+  color: var(--color-text-light);
+}

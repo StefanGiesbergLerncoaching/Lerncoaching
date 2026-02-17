@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Kontaktieren Sie Stefan Giesberg für ein kostenloses Erstgespräch über Lerncoaching für Ihr hochbegabtes Kind.">
-  <title>Kontakt - Stefan Giesberg Lerncoaching</title>
+  <title>Kontakt – Stefan Giesberg Lerncoaching</title>
   <link rel="stylesheet" href="../shared/css/giesberg-design.css">
+  <link rel="stylesheet" href="assets/css/website.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -22,9 +23,9 @@
     }
 
     .contact-hero p {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--color-text-light);
-      max-width: 700px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
@@ -36,9 +37,8 @@
 
     .contact-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.4fr;
       gap: var(--space-xl);
-      margin-bottom: calc(var(--space-xl) * 2);
     }
 
     @media (max-width: 768px) {
@@ -54,20 +54,30 @@
     }
 
     .contact-info h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--color-primary);
-      margin-bottom: var(--space-md);
+      margin-bottom: var(--space-lg);
     }
 
     .contact-item {
-      margin-bottom: var(--space-md);
+      margin-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-lg);
+    }
+
+    .contact-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     .contact-item strong {
       display: block;
       color: var(--color-primary);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       margin-bottom: var(--space-xs);
-      font-weight: 600;
     }
 
     .contact-item a {
@@ -80,6 +90,13 @@
       text-decoration: underline;
     }
 
+    .contact-item p {
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+      margin: 0;
+      max-width: none;
+    }
+
     .contact-form {
       background: var(--color-white);
       border-radius: var(--border-radius-lg);
@@ -88,9 +105,9 @@
     }
 
     .contact-form h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--color-primary);
-      margin-bottom: var(--space-md);
+      margin-bottom: var(--space-lg);
     }
 
     .form-group {
@@ -100,6 +117,7 @@
     .form-group label {
       display: block;
       font-weight: 600;
+      font-size: 0.9rem;
       color: var(--color-text);
       margin-bottom: var(--space-xs);
     }
@@ -110,17 +128,15 @@
     }
 
     .form-group textarea {
-      min-height: 150px;
+      min-height: 140px;
       resize: vertical;
     }
 
     .form-notice {
-      font-size: var(--font-size-sm);
+      font-size: 0.8rem;
       color: var(--color-text-subtle);
       margin-top: var(--space-md);
-      padding: var(--space-md);
-      background: var(--color-light);
-      border-radius: var(--border-radius);
+      line-height: 1.6;
     }
 
     .success-message {
@@ -143,12 +159,17 @@
   <!-- Header -->
   <header class="g-page-header">
     <div class="g-container">
-      <div class="g-page-header__brand">Stefan Giesberg Lerncoaching</div>
+      <a href="index.html" class="g-page-header__brand-wrapper">
+        <svg class="g-page-header__logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M20 34C20 34 5 24 5 13.5C5 9.36 8.58 6 12.75 6C15.6 6 18.1 7.55 19.5 9.85L20 10.7L20.5 9.85C21.9 7.55 24.4 6 27.25 6C31.42 6 35 9.36 35 13.5C35 24 20 34 20 34Z" fill="#F39C12"/>
+        </svg>
+        <span class="g-page-header__brand">Stefan Giesberg Lerncoaching</span>
+      </a>
       <nav class="g-page-header__nav">
         <a href="index.html">Home</a>
         <a href="about.html">Über mich</a>
+        <a href="testimonials.html">Erfahrungsberichte</a>
         <a href="contact.html" class="active">Kontakt</a>
-        <a href="../portal/index.html">Tools</a>
       </nav>
     </div>
   </header>
@@ -156,18 +177,19 @@
   <!-- Hero -->
   <section class="contact-hero">
     <h1>Kontakt</h1>
-    <p>Nehmen Sie Kontakt auf – ich freue mich auf Ihre Nachricht!</p>
+    <p>Nehmen Sie Kontakt auf – ich freue mich auf Ihre Nachricht und melde mich zeitnah.</p>
   </section>
 
   <!-- Content -->
   <main class="contact-content">
     <div class="contact-grid">
-      <!-- Contact Info -->
+
+      <!-- Info -->
       <div class="contact-info">
         <h2>Kontaktinformationen</h2>
         <div class="contact-item">
           <strong>E-Mail</strong>
-          <a href="mailto:stefdan@stefangiesberg.de">stefdan@stefangiesberg.de</a>
+          <a href="mailto:stefan@stefangiesberg.de">stefan@stefangiesberg.de</a>
         </div>
         <div class="contact-item">
           <strong>Telefon</strong>
@@ -177,9 +199,13 @@
           <strong>Erstgespräch</strong>
           <p>Das erste Gespräch ist kostenfrei und unverbindlich. Wir klären gemeinsam, ob mein Angebot für Ihr Kind das Richtige ist.</p>
         </div>
+        <div class="contact-item">
+          <strong>Format</strong>
+          <p>Alle Gespräche und Sitzungen per Videokonferenz – ortsunabhängig in ganz Deutschland.</p>
+        </div>
       </div>
 
-      <!-- Contact Form -->
+      <!-- Form -->
       <div class="contact-form">
         <h2>Nachricht senden</h2>
 
@@ -187,34 +213,33 @@
           <strong>Vielen Dank!</strong> Ihre Nachricht wurde erfolgreich versendet. Ich melde mich in Kürze bei Ihnen.
         </div>
 
-        <!-- TODO: Replace with your Formspree endpoint -->
-        <!-- Sign up at https://formspree.io and replace YOUR_FORM_ID -->
         <form action="https://formspree.io/f/mojnwoqr" method="POST" id="contactForm">
           <div class="form-group">
             <label for="name">Name *</label>
-            <input type="text" class="g-input" id="name" name="name" required>
+            <input type="text" class="g-input" id="name" name="name" required placeholder="Ihr Name">
           </div>
 
           <div class="form-group">
             <label for="email">E-Mail *</label>
-            <input type="email" class="g-input" id="email" name="email" required>
+            <input type="email" class="g-input" id="email" name="email" required placeholder="ihre@email.de">
           </div>
 
           <div class="form-group">
             <label for="phone">Telefon (optional)</label>
-            <input type="tel" class="g-input" id="phone" name="phone">
+            <input type="tel" class="g-input" id="phone" name="phone" placeholder="+49 ...">
           </div>
 
           <div class="form-group">
             <label for="message">Ihre Nachricht *</label>
-            <textarea class="g-textarea" id="message" name="message" required placeholder="Beschreiben Sie kurz Ihr Anliegen..."></textarea>
+            <textarea class="g-textarea" id="message" name="message" required placeholder="Beschreiben Sie kurz Ihr Anliegen – z.B. Alter des Kindes, beobachtete Schwierigkeiten, bisherige Unterstützungsmaßnahmen."></textarea>
           </div>
 
           <button type="submit" class="g-btn g-btn--primary g-btn--lg" style="width: 100%;">Nachricht absenden</button>
 
-          <div class="form-notice">
-            * Pflichtfelder. Ihre Daten werden vertraulich behandelt und nicht an Dritte weitergegeben. Weitere Informationen finden Sie in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.
-          </div>
+          <p class="form-notice">
+            * Pflichtfelder. Ihre Daten werden vertraulich behandelt und nicht an Dritte weitergegeben.
+            Weitere Informationen finden Sie in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.
+          </p>
         </form>
       </div>
     </div>
@@ -226,15 +251,14 @@
       <div class="g-footer__content">
         <div class="g-footer__section">
           <h3>Stefan Giesberg Lerncoaching</h3>
-          <p>Spezialisiert auf hochbegabte Kinder mit Lernblockaden</p>
+          <p>Spezialisiert auf hochbegabte Kinder mit Lese- und Schreibblockaden – Quick-Fix statt jahrelanger Therapie.</p>
         </div>
         <div class="g-footer__section">
           <h4>Navigation</h4>
           <a href="index.html">Home</a>
           <a href="about.html">Über mich</a>
           <a href="testimonials.html">Erfahrungsberichte</a>
-        <a href="contact.html">Kontakt</a>
-          <a href="../portal/index.html">Tools</a>
+          <a href="contact.html">Kontakt</a>
         </div>
         <div class="g-footer__section">
           <h4>Rechtliches</h4>
@@ -243,21 +267,10 @@
         </div>
       </div>
       <div class="g-footer__bottom">
-        <p>&copy; 2026 Stefan Giesberg Lerncoaching | <a href="mailto:stefdan@stefangiesberg.de">stefdan@stefangiesberg.de</a></p>
+        <p>&copy; 2026 Stefan Giesberg Lerncoaching | <a href="mailto:stefan@stefangiesberg.de">stefan@stefangiesberg.de</a></p>
       </div>
     </div>
   </footer>
-
-  <script>
-    // Simple form submission handler for Formspree
-    const form = document.getElementById('contactForm');
-    const successMessage = document.getElementById('successMessage');
-
-    form.addEventListener('submit', function(e) {
-      // Formspree handles the submission, we just show a success message on redirect
-      // Note: Update the action URL with your Formspree endpoint
-    });
-  </script>
 
 </body>
 </html>
