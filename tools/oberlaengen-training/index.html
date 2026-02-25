@@ -914,45 +914,18 @@
 
     // === OBERLAENGEN CLIPPING ===
     function applyClipping(html, visibility) {
-      // Parse HTML, then process text nodes to clip upper-length letters
+      // Clip the BOTTOM portion of each text line (paragraph).
+      // This reveals the top silhouette of the text (Oberlängen = ascenders).
+      // visibility = 60 → show top 60%, hide bottom 40%.
+      const bottomClip = 100 - visibility; // e.g. 60% visible → clip 40% from bottom
+
       const container = document.createElement('div');
       container.innerHTML = html;
 
-      const clipValue = 100 - visibility; // e.g. 60% visible -> clip 40% from top
+      container.querySelectorAll('p').forEach(p => {
+        p.style.clipPath = `inset(0 0 ${bottomClip}% 0)`;
+      });
 
-      function processNode(node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          const text = node.textContent;
-          if (!text.trim()) return;
-
-          const fragment = document.createDocumentFragment();
-          for (let i = 0; i < text.length; i++) {
-            const ch = text[i];
-            if (UPPER_LETTERS.has(ch)) {
-              const span = document.createElement('span');
-              span.className = 'clipped-letter';
-              span.style.clipPath = `inset(${clipValue}% 0 0 0)`;
-              span.textContent = ch;
-              fragment.appendChild(span);
-            } else {
-              // Accumulate non-clipped chars
-              const lastChild = fragment.lastChild;
-              if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
-                lastChild.textContent += ch;
-              } else {
-                fragment.appendChild(document.createTextNode(ch));
-              }
-            }
-          }
-          node.parentNode.replaceChild(fragment, node);
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          // Process children (iterate backwards to handle DOM changes)
-          const children = Array.from(node.childNodes);
-          children.forEach(child => processNode(child));
-        }
-      }
-
-      processNode(container);
       return container.innerHTML;
     }
 
@@ -1036,7 +1009,6 @@
     }
 
     async function createPDF(text, visibility, filename) {
-      const renderEl = document.getElementById('pdfRender');
       const pretext = document.getElementById('pretextInput').value;
 
       let content = '';
@@ -1052,19 +1024,47 @@
       const html = parseMarkdown(transformedText);
       content += applyClipping(html, visibility);
 
-      renderEl.innerHTML = content +
+      // Build a temporary render element that html2canvas can capture.
+      // The persistent #pdfRender at left:-9999px is invisible to html2canvas,
+      // so we create a fixed-position clone with near-zero opacity instead.
+      const renderEl = document.createElement('div');
+      renderEl.style.cssText = [
+        'position: fixed',
+        'top: 0',
+        'left: 0',
+        'width: 190mm',
+        'font-family: Arial, sans-serif',
+        'font-size: 12pt',
+        'line-height: 1.8',
+        'color: #000',
+        'background: #fff',
+        'padding: 0',
+        'opacity: 0.01',
+        'pointer-events: none',
+        'z-index: -1'
+      ].join('; ');
+
+      renderEl.innerHTML =
+        '<style>p{margin-bottom:0.8em;max-width:none;}strong{font-weight:700;}em{font-style:italic;}u{text-decoration:underline;}.pdf-footer{text-align:center;font-size:10pt;color:#666;border-top:1px solid #ddd;padding-top:10px;margin-top:20px;}</style>' +
+        content +
         '<div class="pdf-footer">&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
+
+      document.body.appendChild(renderEl);
 
       const opt = {
         margin: 10,
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      await html2pdf().set(opt).from(renderEl).save();
+      try {
+        await html2pdf().set(opt).from(renderEl).save();
+      } finally {
+        document.body.removeChild(renderEl);
+      }
     }
 
     // === UTILS ===
