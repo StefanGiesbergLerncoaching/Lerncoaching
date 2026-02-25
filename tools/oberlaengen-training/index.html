@@ -1024,9 +1024,12 @@
       const html = parseMarkdown(transformedText);
       content += applyClipping(html, visibility);
 
-      // Build a temporary render element that html2canvas can capture.
-      // The persistent #pdfRender at left:-9999px is invisible to html2canvas,
-      // so we create a fixed-position clone with near-zero opacity instead.
+      // Temporäres Render-Element für html2canvas.
+      // Regeln:
+      //  - position:fixed + top:0 + left:0  → innerhalb des Viewports (nicht off-screen)
+      //  - z-index:9999                      → VORNE, nicht hinter dem Body-Hintergrund
+      //  - opacity:0.01                      → für den Nutzer kaum sichtbar, aber vom Browser gerendert
+      //  - pointer-events:none               → kein versehentlicher Klick
       const renderEl = document.createElement('div');
       renderEl.style.cssText = [
         'position: fixed',
@@ -1041,21 +1044,27 @@
         'padding: 0',
         'opacity: 0.01',
         'pointer-events: none',
-        'z-index: -1'
+        'z-index: 9999'
       ].join('; ');
 
-      renderEl.innerHTML =
-        '<style>p{margin-bottom:0.8em;max-width:none;}strong{font-weight:700;}em{font-style:italic;}u{text-decoration:underline;}.pdf-footer{text-align:center;font-size:10pt;color:#666;border-top:1px solid #ddd;padding-top:10px;margin-top:20px;}</style>' +
-        content +
-        '<div class="pdf-footer">&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
+      // Inline-Stile für p-Elemente setzen (kein <style>-Tag nötig)
+      const styledContent = content.replace(/<p>/g,
+        '<p style="margin-bottom:0.8em;max-width:none;font-family:Arial,sans-serif;font-size:12pt;line-height:1.8;color:#000;">');
+
+      renderEl.innerHTML = styledContent +
+        '<div style="text-align:center;font-size:10pt;color:#666;border-top:1px solid #ddd;padding-top:10px;margin-top:20px;">' +
+        '&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
 
       document.body.appendChild(renderEl);
+
+      // Kurz warten, damit der Browser das Layout abschließt, bevor html2canvas rendert
+      await new Promise(r => setTimeout(r, 200));
 
       const opt = {
         margin: 10,
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
