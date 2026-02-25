@@ -914,16 +914,23 @@
 
     // === OBERLAENGEN CLIPPING ===
     function applyClipping(html, visibility) {
-      // Clip the BOTTOM portion of each text line (paragraph).
-      // This reveals the top silhouette of the text (Oberlängen = ascenders).
+      // Clip the BOTTOM portion of each individual text line.
+      // Problem: parseMarkdown converts single \n to <br>, so multiple
+      // lines end up in ONE <p>. We must split on <br> first so that
+      // each visual line gets its own <p> and its own clip-path.
       // visibility = 60 → show top 60%, hide bottom 40%.
-      const bottomClip = 100 - visibility; // e.g. 60% visible → clip 40% from bottom
+      const bottomClip = 100 - visibility;
+
+      // Split <br> tags into separate paragraphs for per-line clipping
+      html = html.replace(/<br\s*\/?>/gi, '</p><p>');
 
       const container = document.createElement('div');
       container.innerHTML = html;
 
       container.querySelectorAll('p').forEach(p => {
+        if (p.textContent.trim() === '') return; // skip empty paragraphs
         p.style.clipPath = `inset(0 0 ${bottomClip}% 0)`;
+        p.style.marginBottom = '0.5em';
       });
 
       return container.innerHTML;
@@ -1025,14 +1032,13 @@
       content += applyClipping(html, visibility);
 
       // Temporäres Render-Element für html2canvas.
-      // Regeln:
-      //  - position:fixed + top:0 + left:0  → innerhalb des Viewports (nicht off-screen)
-      //  - z-index:9999                      → VORNE, nicht hinter dem Body-Hintergrund
-      //  - opacity:0.01                      → für den Nutzer kaum sichtbar, aber vom Browser gerendert
-      //  - pointer-events:none               → kein versehentlicher Klick
+      // WICHTIG: opacity muss 1 sein – html2canvas rendert als JPEG,
+      // bei opacity < 1 wird der Text fast-transparent → leere PDF-Seite.
+      // Das Element liegt über der Seite (z-index:9999) und ist kurz sichtbar,
+      // wird aber sofort nach dem Export wieder entfernt.
       const renderEl = document.createElement('div');
       renderEl.style.cssText = [
-        'position: fixed',
+        'position: absolute',
         'top: 0',
         'left: 0',
         'width: 190mm',
@@ -1041,27 +1047,31 @@
         'line-height: 1.8',
         'color: #000',
         'background: #fff',
-        'padding: 0',
-        'opacity: 0.01',
+        'padding: 10mm',
+        'box-sizing: border-box',
         'pointer-events: none',
         'z-index: 9999'
       ].join('; ');
 
-      // Inline-Stile für p-Elemente setzen (kein <style>-Tag nötig)
-      const styledContent = content.replace(/<p>/g,
-        '<p style="margin-bottom:0.8em;max-width:none;font-family:Arial,sans-serif;font-size:12pt;line-height:1.8;color:#000;">');
+      // Inline-Stile für p-Elemente (werden in applyClipping schon gesetzt)
+      const styledContent = content.replace(/<p /g,
+        '<p style="margin-bottom:0.5em;max-width:none;" ').replace(/<p>/g,
+        '<p style="margin-bottom:0.5em;max-width:none;">');
 
       renderEl.innerHTML = styledContent +
         '<div style="text-align:center;font-size:10pt;color:#666;border-top:1px solid #ddd;padding-top:10px;margin-top:20px;">' +
         '&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
 
+      // Zum Seitenanfang scrollen, damit das absolute-positionierte Element im Viewport ist
+      const prevScrollY = window.scrollY;
+      window.scrollTo(0, 0);
       document.body.appendChild(renderEl);
 
-      // Kurz warten, damit der Browser das Layout abschließt, bevor html2canvas rendert
-      await new Promise(r => setTimeout(r, 200));
+      // Kurz warten, damit Browser das Layout abschließt
+      await new Promise(r => setTimeout(r, 150));
 
       const opt = {
-        margin: 10,
+        margin: 0,
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
@@ -1073,6 +1083,7 @@
         await html2pdf().set(opt).from(renderEl).save();
       } finally {
         document.body.removeChild(renderEl);
+        window.scrollTo(0, prevScrollY);
       }
     }
 
