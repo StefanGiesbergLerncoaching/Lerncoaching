@@ -545,6 +545,18 @@
           <div class="markdown-help">
             Markdown: <code>**fett**</code> &middot; <code>*kursiv*</code> &middot; <code>__unterstrichen__</code> &middot; Doppel-Enter = Absatz
           </div>
+
+          <!-- Auto-Zeilenumbruch -->
+          <div class="shuffle-toggle" style="margin-top: var(--space-md);">
+            <input type="checkbox" id="autoBreakToggle" checked onchange="updatePreview()">
+            <label for="autoBreakToggle">
+              Auto-Zeilenumbruch bei
+              <input type="number" id="autoBreakChars" value="50" min="20" max="100" step="5"
+                style="width:52px;display:inline-block;margin:0 4px;padding:2px 4px;font-size:0.9em;"
+                onclick="event.stopPropagation()" oninput="updatePreview()">
+              Zeichen pro Zeile
+            </label>
+          </div>
         </div>
 
         <!-- === BUCHSTABEN-ERSETZUNG & MISCHEN === -->
@@ -595,9 +607,9 @@
           <label class="g-label">Presets</label>
           <div class="preset-row">
             <button class="preset-btn active" onclick="applyPreset('standard', this)">Standard (50-80%)</button>
-            <button class="preset-btn" onclick="applyPreset('alle', this)">Alle (20-90%)</button>
+            <button class="preset-btn" onclick="applyPreset('alle', this)">Alle (45-90%)</button>
             <button class="preset-btn" onclick="applyPreset('leicht', this)">Leicht (70-90%)</button>
-            <button class="preset-btn" onclick="applyPreset('schwer', this)">Schwer (20-50%)</button>
+            <button class="preset-btn" onclick="applyPreset('schwer', this)">Schwer (45-60%)</button>
             <button class="preset-btn" onclick="applyPreset('keine', this)">Keine</button>
           </div>
 
@@ -668,13 +680,13 @@
 
     // === CONSTANTS ===
     const UPPER_LETTERS = new Set(['b','d','f','h','k','l','t','B','D','F','H','K','L','T']);
-    const ALL_STEPS = [20,25,30,35,40,45,50,55,60,65,70,75,80,85,90];
+    const ALL_STEPS = [45,50,55,60,65,70,75,80,85,90];
 
     const PRESETS = {
       standard: [50,55,60,70,80],
       alle: ALL_STEPS,
       leicht: [70,75,80,85,90],
-      schwer: [20,25,30,35,40,45,50],
+      schwer: [45,50,55,60],
       keine: []
     };
 
@@ -889,11 +901,37 @@
       return text.replace(/[a-zA-ZäöüÄÖÜß]+/g, match => scrambleWord(match));
     }
 
-    // === TEXT TRANSFORMATIONS (Replacements + Shuffle on plain text) ===
+    // === TEXT TRANSFORMATIONS (Replacements + Shuffle + Auto-Break) ===
     function applyTextTransforms(text) {
-      let result = applyReplacementsToText(text);
+      let result = autoBreakLines(text);
+      result = applyReplacementsToText(result);
       result = applyShuffleToText(result);
       return result;
+    }
+
+    // === AUTO ZEILENUMBRUCH ===
+    function autoBreakLines(text) {
+      const toggle = document.getElementById('autoBreakToggle');
+      if (!toggle || !toggle.checked) return text;
+      const maxChars = parseInt(document.getElementById('autoBreakChars').value) || 50;
+
+      return text.split('\n').map(line => {
+        if (line.length <= maxChars) return line;
+        const words = line.split(' ');
+        const lines = [];
+        let current = '';
+        for (const word of words) {
+          const candidate = current ? current + ' ' + word : word;
+          if (candidate.length > maxChars && current) {
+            lines.push(current);
+            current = word;
+          } else {
+            current = candidate;
+          }
+        }
+        if (current) lines.push(current);
+        return lines.join('\n');
+      }).join('\n');
     }
 
     // === MARKDOWN PARSER ===
@@ -918,7 +956,8 @@
       // Reine String-Verarbeitung – kein DOM, kein querySelectorAll.
       // Jede Zeile wird in ein <div> mit overflow:hidden + height gewrapped.
       // visibility=70 → obere 70% jeder Zeile sichtbar (line-height=1.8em).
-      const heightEm = (visibility / 100 * 1.8).toFixed(3);
+      const LINE_HEIGHT = 2.2;
+      const heightEm = (visibility / 100 * LINE_HEIGHT).toFixed(3);
 
       // Alle Zeilentrenner (br und </p><p>) auf einheitliches Trennzeichen
       let processed = html
@@ -932,7 +971,7 @@
         .filter(line => line.trim())
         .map(line =>
           `<div style="overflow:hidden;height:${heightEm}em;` +
-          `line-height:1.8;margin-bottom:0.4em;">${line}</div>`
+          `line-height:${LINE_HEIGHT};margin-bottom:0.6em;">${line}</div>`
         )
         .join('');
     }
@@ -1038,7 +1077,7 @@
       renderEl.style.cssText =
         'position:absolute;top:0;left:0;z-index:99999;' +
         'width:794px;background:white;color:#000;' +
-        'font-family:Arial,sans-serif;font-size:15px;line-height:1.8;' +
+        'font-family:Arial,sans-serif;font-size:15px;line-height:2.2;' +
         'padding:60px;box-sizing:border-box;';
       renderEl.innerHTML = content + footer;
 
