@@ -970,30 +970,30 @@
 
     // === PDF TEST (Debug) ===
     async function testPDF() {
-      // Schritt 1: Kann html2canvas überhaupt etwas rendern?
-      // Minimaler Test: kein Clipping, kein komplexes HTML, nur Text.
+      // Schritt 2: html2canvas DIREKT aufrufen, Canvas-Größe per Alert prüfen.
+      // Kein html2pdf-Wrapper, kein Positioning-Trick – einfachst möglich.
       const renderEl = document.createElement('div');
-      renderEl.style.cssText = 'position:absolute;top:0;left:0;width:190mm;background:#fff;color:#000;font-size:14pt;font-family:Arial,sans-serif;padding:20mm;box-sizing:border-box;z-index:9999;';
-      renderEl.innerHTML = '<p style="color:red;font-size:20pt;">TEST 123</p><p>Zweite Zeile</p><p>Dritte Zeile</p>';
-
-      const prevScrollY = window.scrollY;
-      window.scrollTo(0, 0);
+      renderEl.style.cssText = 'width:500px;background:white;color:black;font-size:20pt;font-family:Arial,sans-serif;padding:40px;border:3px solid red;';
+      renderEl.innerHTML = '<p style="color:red;">TEST ROT</p><p style="color:blue;">TEST BLAU</p>';
       document.body.appendChild(renderEl);
-      await new Promise(r => setTimeout(r, 200));
 
-      const opt = {
-        margin: 0,
-        filename: 'TEST_pdf.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: true, scrollX: 0, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+      await new Promise(r => setTimeout(r, 300));
 
       try {
-        await html2pdf().set(opt).from(renderEl).save();
+        const canvas = await html2canvas(renderEl, { scale: 1, logging: false });
+        alert('Canvas: ' + canvas.width + ' × ' + canvas.height + ' px\n\n0×0 = html2canvas rendert nichts.\nGroß = funktioniert → PDF folgt.');
+
+        if (canvas.width > 10 && canvas.height > 10) {
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const w = pdf.internal.pageSize.getWidth();
+          const h = (canvas.height * w) / canvas.width;
+          pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+          pdf.save('TEST_direkt.pdf');
+        }
       } finally {
         document.body.removeChild(renderEl);
-        window.scrollTo(0, prevScrollY);
       }
     }
 
