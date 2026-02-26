@@ -1089,6 +1089,11 @@
 
       await new Promise(r => setTimeout(r, 250));
 
+      // DEBUG
+      alert('DEBUG – renderEl: ' + renderEl.offsetWidth + '×' + renderEl.offsetHeight
+        + 'px | html2canvas: ' + (typeof html2canvas)
+        + ' | jspdf: ' + (typeof window.jspdf));
+
       try {
         const canvas = await html2canvas(renderEl, {
           scale: 2,
@@ -1098,6 +1103,8 @@
           scrollX: 0,
           scrollY: 0
         });
+
+        alert('Canvas: ' + canvas.width + '×' + canvas.height + ' px');
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const { jsPDF } = window.jspdf;
@@ -1119,6 +1126,8 @@
         }
 
         pdf.save(filename);
+      } catch (err) {
+        alert('FEHLER: ' + err.message);
       } finally {
         document.body.removeChild(renderEl);
         window.scrollTo(0, prevScrollY);
