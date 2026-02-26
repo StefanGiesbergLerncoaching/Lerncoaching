@@ -957,7 +957,9 @@
       // Jede Zeile wird in ein <div> mit overflow:hidden + height gewrapped.
       // visibility=70 → obere 70% jeder Zeile sichtbar (line-height=1.8em).
       const LINE_HEIGHT = 2.2;
-      const heightEm = (visibility / 100 * LINE_HEIGHT).toFixed(3);
+      // Kalibrierungsformel: 50% = Mittellinie des kleinen 'e' gerade sichtbar,
+      // 100% = gesamte Zeile inkl. Unterlängen sichtbar.
+      const heightEm = (0.5 + visibility / 100 * 1.4).toFixed(3);
 
       // Alle Zeilentrenner (br und </p><p>) auf einheitliches Trennzeichen
       let processed = html
