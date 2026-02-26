@@ -619,6 +619,9 @@
             <button class="g-btn g-btn--secondary" onclick="generateSinglePDF()">
               Nur aktuelle Vorschau als PDF
             </button>
+            <button class="g-btn g-btn--outline g-btn--sm" onclick="testPDF()" title="Debug: minimaler PDF-Test ohne Clipping">
+              🧪 PDF-Test
+            </button>
           </div>
 
           <!-- Progress -->
@@ -963,6 +966,35 @@
       }
 
       previewEl.innerHTML = output;
+    }
+
+    // === PDF TEST (Debug) ===
+    async function testPDF() {
+      // Schritt 1: Kann html2canvas überhaupt etwas rendern?
+      // Minimaler Test: kein Clipping, kein komplexes HTML, nur Text.
+      const renderEl = document.createElement('div');
+      renderEl.style.cssText = 'position:absolute;top:0;left:0;width:190mm;background:#fff;color:#000;font-size:14pt;font-family:Arial,sans-serif;padding:20mm;box-sizing:border-box;z-index:9999;';
+      renderEl.innerHTML = '<p style="color:red;font-size:20pt;">TEST 123</p><p>Zweite Zeile</p><p>Dritte Zeile</p>';
+
+      const prevScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+      document.body.appendChild(renderEl);
+      await new Promise(r => setTimeout(r, 200));
+
+      const opt = {
+        margin: 0,
+        filename: 'TEST_pdf.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: true, scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        await html2pdf().set(opt).from(renderEl).save();
+      } finally {
+        document.body.removeChild(renderEl);
+        window.scrollTo(0, prevScrollY);
+      }
     }
 
     // === PDF GENERATION ===
