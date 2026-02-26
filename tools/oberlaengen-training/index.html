@@ -620,9 +620,6 @@
             <button class="g-btn g-btn--secondary" onclick="generateSinglePDF()">
               Nur aktuelle Vorschau als PDF
             </button>
-            <button class="g-btn g-btn--outline g-btn--sm" onclick="testPDF()" title="Debug: minimaler PDF-Test ohne Clipping">
-              🧪 PDF-Test
-            </button>
           </div>
 
           <!-- Progress -->
@@ -918,23 +915,23 @@
 
     // === OBERLAENGEN CLIPPING ===
     function applyClipping(html, visibility) {
-      // Clip the BOTTOM portion of each individual text line.
-      // Problem: parseMarkdown converts single \n to <br>, so multiple
-      // lines end up in ONE <p>. We must split on <br> first so that
-      // each visual line gets its own <p> and its own clip-path.
-      // visibility = 60 → show top 60%, hide bottom 40%.
-      const bottomClip = 100 - visibility;
+      // Jede Zeile einzeln clippen: <br> → eigene <p>, dann
+      // overflow:hidden + height statt clip-path (html2canvas-kompatibel).
+      // visibility=70 → zeige obere 70% jeder Zeile (line-height=1.8em).
+      const visibleEm = (visibility / 100 * 1.8).toFixed(3);
 
-      // Split <br> tags into separate paragraphs for per-line clipping
       html = html.replace(/<br\s*\/?>/gi, '</p><p>');
 
       const container = document.createElement('div');
       container.innerHTML = html;
 
       container.querySelectorAll('p').forEach(p => {
-        if (p.textContent.trim() === '') return; // skip empty paragraphs
-        p.style.clipPath = `inset(0 0 ${bottomClip}% 0)`;
-        p.style.marginBottom = '0.5em';
+        if (p.textContent.trim() === '') return;
+        p.style.overflow = 'hidden';
+        p.style.height = visibleEm + 'em';
+        p.style.marginBottom = '0.4em';
+        p.style.display = 'block';
+        p.style.lineHeight = '1.8';
       });
 
       return container.innerHTML;
@@ -967,34 +964,6 @@
       }
 
       previewEl.innerHTML = output;
-    }
-
-    // === PDF TEST (Debug) ===
-    async function testPDF() {
-      const renderEl = document.createElement('div');
-      renderEl.style.cssText = 'width:500px;background:white;color:black;font-size:20pt;font-family:Arial,sans-serif;padding:40px;border:3px solid red;';
-      renderEl.innerHTML = '<p style="color:red;">TEST ROT</p><p style="color:blue;">TEST BLAU</p>';
-      document.body.appendChild(renderEl);
-      await new Promise(r => setTimeout(r, 300));
-
-      try {
-        const canvas = await html2canvas(renderEl, { scale: 1 });
-        alert('Canvas: ' + canvas.width + ' × ' + canvas.height + ' px');
-
-        if (canvas.width > 10 && canvas.height > 10) {
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const w = pdf.internal.pageSize.getWidth();
-          const h = (canvas.height * w) / canvas.width;
-          pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
-          pdf.save('TEST_direkt.pdf');
-        }
-      } catch(e) {
-        alert('Fehler: ' + e.message);
-      } finally {
-        document.body.removeChild(renderEl);
-      }
     }
 
     // === PDF GENERATION ===
@@ -1051,71 +1020,59 @@
       const pretext = document.getElementById('pretextInput').value;
 
       let content = '';
-
-      // Vortext (unver\u00e4ndert)
       if (pretext.trim()) {
-        content += '<div style="margin-bottom:1.5em; padding-bottom:1em; border-bottom:2px solid #ccc;">'
+        content += '<div style="margin-bottom:1.5em;padding-bottom:1em;border-bottom:2px solid #ccc;">'
           + parseMarkdown(pretext) + '</div>';
       }
-
-      // Lesetext (mit Ersetzungen, Mischen und Clipping)
       const transformedText = applyTextTransforms(text);
-      const html = parseMarkdown(transformedText);
-      content += applyClipping(html, visibility);
+      const clippedHtml = applyClipping(parseMarkdown(transformedText), visibility);
+      content += clippedHtml;
 
-      // Temporäres Render-Element für html2canvas.
-      // WICHTIG: opacity muss 1 sein – html2canvas rendert als JPEG,
-      // bei opacity < 1 wird der Text fast-transparent → leere PDF-Seite.
-      // Das Element liegt über der Seite (z-index:9999) und ist kurz sichtbar,
-      // wird aber sofort nach dem Export wieder entfernt.
-      const renderEl = document.createElement('div');
-      renderEl.style.cssText = [
-        'position: absolute',
-        'top: 0',
-        'left: 0',
-        'width: 190mm',
-        'font-family: Arial, sans-serif',
-        'font-size: 12pt',
-        'line-height: 1.8',
-        'color: #000',
-        'background: #fff',
-        'padding: 10mm',
-        'box-sizing: border-box',
-        'pointer-events: none',
-        'z-index: 9999'
-      ].join('; ');
-
-      // Inline-Stile für p-Elemente (werden in applyClipping schon gesetzt)
-      const styledContent = content.replace(/<p /g,
-        '<p style="margin-bottom:0.5em;max-width:none;" ').replace(/<p>/g,
-        '<p style="margin-bottom:0.5em;max-width:none;">');
-
-      renderEl.innerHTML = styledContent +
-        '<div style="text-align:center;font-size:10pt;color:#666;border-top:1px solid #ddd;padding-top:10px;margin-top:20px;">' +
+      const footer = '<div style="text-align:center;font-size:10pt;color:#666;' +
+        'border-top:1px solid #ddd;padding-top:10px;margin-top:20px;">' +
         '&copy; Stefan Giesberg Lerncoaching &bull; stefangiesberg.de</div>';
 
-      // Zum Seitenanfang scrollen, damit das absolute-positionierte Element im Viewport ist
-      const prevScrollY = window.scrollY;
-      window.scrollTo(0, 0);
+      // Render-Element: in den normalen Dokumentfluss am Ende des Body,
+      // html2canvas erfasst es direkt ohne Positioning-Tricks.
+      const renderEl = document.createElement('div');
+      renderEl.style.cssText = 'width:794px;background:white;color:#000;' +
+        'font-family:Arial,sans-serif;font-size:15px;line-height:1.8;' +
+        'padding:60px;box-sizing:border-box;';
+      renderEl.innerHTML = content + footer;
       document.body.appendChild(renderEl);
 
-      // Kurz warten, damit Browser das Layout abschließt
-      await new Promise(r => setTimeout(r, 150));
-
-      const opt = {
-        margin: 0,
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
+      await new Promise(r => setTimeout(r, 200));
 
       try {
-        await html2pdf().set(opt).from(renderEl).save();
+        const canvas = await html2canvas(renderEl, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const imgH = (canvas.height * pageW) / canvas.width;
+
+        // Mehrseitige PDFs
+        let remaining = imgH;
+        let yPos = 0;
+        pdf.addImage(imgData, 'JPEG', 0, yPos, pageW, imgH);
+        remaining -= pageH;
+        while (remaining > 0) {
+          yPos -= pageH;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, yPos, pageW, imgH);
+          remaining -= pageH;
+        }
+
+        pdf.save(filename);
       } finally {
         document.body.removeChild(renderEl);
-        window.scrollTo(0, prevScrollY);
       }
     }
 
