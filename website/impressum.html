@@ -52,7 +52,12 @@
         </svg>
         <span class="g-page-header__brand">Stefan Giesberg Lerncoaching</span>
       </a>
-      <nav class="g-page-header__nav">
+      <button class="nav-hamburger" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="g-page-header__nav" id="main-nav">
         <a href="index.html">Home</a>
         <a href="about.html">Über mich</a>
         <a href="testimonials.html">Erfahrungsberichte</a>
@@ -129,5 +134,26 @@
     </div>
   </footer>
 
+  <script>
+    (function () {
+      var btn = document.querySelector('.nav-hamburger');
+      var nav = document.querySelector('.g-page-header__nav');
+      if (!btn || !nav) return;
+      btn.addEventListener('click', function () {
+        var open = nav.classList.toggle('nav-open');
+        btn.classList.toggle('nav-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.g-page-header')) {
+          nav.classList.remove('nav-open');
+          btn.classList.remove('nav-open');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.setAttribute('aria-label', 'Menü öffnen');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

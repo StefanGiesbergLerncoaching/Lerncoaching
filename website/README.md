@@ -48,24 +48,34 @@ website/
 3. Branch: `main`, Folder: `/website`
 4. Save → GitHub baut die Seite automatisch
 
-### 4. Custom Domain einrichten
-1. In GitHub Pages Settings: Custom domain → `stefangiesberg.de`
-2. Bei Ihrem Domain-Provider (z.B. Strato, 1&1):
-   - A-Records für GitHub Pages IPs:
-     ```
-     185.199.108.153
-     185.199.109.153
-     185.199.110.153
-     185.199.111.153
-     ```
-   - CNAME für `www`: `stefangiesberglerncoaching.github.io`
-3. "Enforce HTTPS" aktivieren (nach DNS-Propagation)
+### 4. Custom Domain einrichten ← **NÄCHSTER SCHRITT**
 
-## 🚀 Deployment
+`CNAME`-Datei ist bereits in `website/CNAME` vorhanden (`stefangiesberg.de`).
 
-Die Website wird automatisch über GitHub Pages deployed:
-- Bei jedem Push auf `main` wird die Seite neu gebaut
-- URL (temporär): `https://stefangiesberglerncoaching.github.io/lerncoaching/website/`
+**Beim Domain-Provider (z.B. Strato, 1&1) einstellen:**
+```
+A-Record:  @  →  185.199.108.153
+A-Record:  @  →  185.199.109.153
+A-Record:  @  →  185.199.110.153
+A-Record:  @  →  185.199.111.153
+CNAME:     www → stefangiesberglerncoaching.github.io
+```
+
+**In GitHub Pages Settings:**
+1. Settings → Pages → Custom domain → `stefangiesberg.de` eingeben → Save
+2. Warten bis DNS propagiert (~24h)
+3. "Enforce HTTPS" aktivieren
+
+## 🚀 Deployment-Status
+
+| Schritt | Status |
+|---------|--------|
+| GitHub Pages aktiviert | ☐ noch nicht |
+| CNAME-Datei committed | ✅ `website/CNAME` vorhanden |
+| DNS A-Records beim Provider | ☐ noch nicht |
+| Custom Domain in GitHub Settings | ☐ noch nicht |
+| HTTPS aktiv | ☐ nach DNS-Propagation |
+
 - URL (nach Custom Domain): `https://stefangiesberg.de`
 
 ## 🔗 Links
@@ -77,8 +87,10 @@ Die Website wird automatisch über GitHub Pages deployed:
 ## ✅ Features
 
 - ✅ Responsive Design (Mobile, Tablet, Desktop)
+- ✅ Hamburger-Menü auf Mobile (alle Seiten)
 - ✅ SEO-optimiert (Meta-Tags, semantisches HTML)
 - ✅ Barrierearm (ARIA-Labels, semantische Struktur)
-- ✅ Schnell (minimales CSS, keine JS-Frameworks)
+- ✅ Schnell (minimales CSS, kein JS-Framework)
 - ✅ Kontaktformular via Formspree
 - ✅ Datenschutzkonform (DSGVO-Text vorhanden)
+- ✅ CNAME + .nojekyll für GitHub Pages / Custom Domain

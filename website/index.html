@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lerncoaching für hochbegabte Kinder mit Lese- und Schreibblockaden. Quick-Fix statt jahrelanger Therapie – oft in 1–2 Sitzungen.">
+  <meta name="description" content="Lerncoaching für hochbegabte Kinder mit Lese- und Schreibblockaden. Einschätzung und erste Korrektur in einem einzigen Termin – ohne jahrelange Therapie.">
   <title>Stefan Giesberg Lerncoaching – Hochbegabtenförderung &amp; Lernblockaden</title>
   <link rel="stylesheet" href="../shared/css/giesberg-design.css">
   <link rel="stylesheet" href="assets/css/website.css">
@@ -12,97 +12,111 @@
   <style>
     /* === HERO === */
     .hero {
-      background: linear-gradient(135deg, var(--color-primary) 0%, #1a4d6d 100%);
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      background:
+        linear-gradient(100deg, rgba(30,50,75,0.97) 38%, rgba(30,50,75,0.72) 62%, rgba(30,50,75,0.15) 100%),
+        url('assets/img/hero-junge.webp') center 30% / cover no-repeat;
       color: var(--color-white);
-      padding: calc(var(--space-xl) * 3) var(--space-xl) calc(var(--space-xl) * 2);
+      padding: calc(var(--space-xl) * 2.5) var(--space-xl);
     }
 
     .hero-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: calc(var(--space-xl) * 1.5);
-      align-items: center;
+      max-width: 600px;
+      margin: 0;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: var(--space-md);
     }
 
     .hero h1 {
-      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
       margin-bottom: var(--space-lg);
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.15;
       color: var(--color-white) !important;
     }
 
     .hero p {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      line-height: 1.7;
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      line-height: 1.75;
       margin-bottom: var(--space-xl);
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.88);
       max-width: none;
     }
 
-    .hero .g-btn {
-      font-size: 1.1rem;
-      padding: var(--space-md) var(--space-xl);
+    @media (max-width: 600px) {
+      .hero {
+        min-height: auto;
+        background-position: 70% center;
+        padding: calc(var(--space-xl) * 1.5) var(--space-lg);
+      }
+      .hero-inner { max-width: 100%; }
     }
 
-    @media (max-width: 860px) {
-      .hero-inner {
-        grid-template-columns: 1fr;
-      }
-      .hero-image-col {
-        display: none;
-      }
-      .hero { text-align: center; }
-    }
-
-    /* === CONTENT SECTIONS === */
-    .content-section {
-      padding: calc(var(--space-xl) * 2) var(--space-xl);
+    /* === USP-STREIFEN === */
+    .usp-section {
       background: var(--color-white);
+      padding: calc(var(--space-xl) * 1.5) var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
     }
 
-    .content-section.alt-bg {
-      background: var(--color-light);
-    }
-
-    .section-inner {
-      max-width: var(--max-width);
+    .usp-inner {
+      max-width: 1100px;
       margin: 0 auto;
-    }
-
-    .section-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-xl);
-      align-items: center;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
     }
 
-    @media (max-width: 768px) {
-      .section-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .section-image {
-      width: 100%;
+    .usp-card {
+      text-align: center;
+      padding: var(--space-lg) var(--space-md);
       border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-md);
+      background: var(--color-light);
+      border-top: 3px solid var(--color-accent);
     }
 
-    .section-text h2 {
-      font-size: clamp(1.6rem, 3.5vw, 2.3rem);
-      margin-bottom: var(--space-lg);
+    .usp-number {
+      font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--color-accent);
+      line-height: 1.1;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+
+    .usp-label {
+      font-size: 0.82rem;
+      font-weight: 700;
       color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-sm);
     }
 
-    .section-text p {
-      font-size: 1.05rem;
-      line-height: 1.8;
-      margin-bottom: var(--space-md);
+    .usp-card p {
+      font-size: 0.88rem;
+      line-height: 1.6;
       color: var(--color-text-light);
+      margin: 0;
       max-width: none;
+    }
+
+    @media (max-width: 900px) {
+      .usp-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .usp-inner { grid-template-columns: 1fr; }
     }
 
     /* === KONZEPT-SECTION === */
@@ -143,7 +157,7 @@
 
     .konzept-card h4 {
       color: var(--color-accent) !important;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: var(--space-md);
@@ -158,9 +172,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .konzept-table tr:last-child {
-      border-bottom: none;
-    }
+    .konzept-table tr:last-child { border-bottom: none; }
 
     .konzept-table td {
       padding: var(--space-sm) var(--space-md);
@@ -176,14 +188,10 @@
       white-space: nowrap;
     }
 
-    .konzept-table td:last-child {
-      color: rgba(255, 255, 255, 0.65);
-    }
+    .konzept-table td:last-child { color: rgba(255, 255, 255, 0.65); }
 
     @media (max-width: 768px) {
-      .konzept-inner {
-        grid-template-columns: 1fr;
-      }
+      .konzept-inner { grid-template-columns: 1fr; }
     }
 
     /* === STEPS SECTION === */
@@ -199,11 +207,11 @@
     }
 
     .steps-header .overline {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--color-accent);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       margin-bottom: var(--space-sm);
       display: block;
     }
@@ -216,8 +224,8 @@
 
     .steps-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: var(--space-xl);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-lg);
       max-width: 1100px;
       margin: 0 auto;
     }
@@ -226,12 +234,11 @@
       background: var(--color-light);
       border-radius: var(--border-radius-lg);
       padding: var(--space-xl);
-      border-top: 4px solid var(--color-accent);
-      transition: all var(--transition-base);
+      border-top: 3px solid var(--color-accent);
+      transition: box-shadow var(--transition-base);
     }
 
     .step-card:hover {
-      transform: translateY(-4px);
       box-shadow: var(--shadow-md);
     }
 
@@ -239,27 +246,35 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       background: var(--color-accent);
       color: var(--color-white);
       border-radius: 50%;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: var(--space-md);
     }
 
     .step-card h3 {
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       color: var(--color-primary);
       margin-bottom: var(--space-sm);
     }
 
     .step-card p {
-      font-size: 1rem;
+      font-size: 0.95rem;
       line-height: 1.7;
       color: var(--color-text-light);
       max-width: none;
+    }
+
+    .step-note {
+      margin-top: var(--space-sm);
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--color-accent);
+      font-weight: 600;
     }
 
     /* === FUER WEN SECTION === */
@@ -298,7 +313,7 @@
     }
 
     .fuerwen-box h3 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       margin-bottom: var(--space-md);
     }
 
@@ -314,15 +329,13 @@
     .fuerwen-list li {
       padding: var(--space-sm) 0 var(--space-sm) 1.8rem;
       position: relative;
-      font-size: 1rem;
+      font-size: 0.97rem;
       line-height: 1.6;
       color: var(--color-text-light);
       border-bottom: 1px solid var(--color-border);
     }
 
-    .fuerwen-list li:last-child {
-      border-bottom: none;
-    }
+    .fuerwen-list li:last-child { border-bottom: none; }
 
     .fuerwen-list li::before {
       position: absolute;
@@ -341,7 +354,7 @@
     }
 
     .fuerwen-note {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--color-text-subtle);
       font-style: italic;
       margin-top: var(--space-md);
@@ -350,16 +363,145 @@
       border-radius: var(--border-radius);
     }
 
+    /* === TESTIMONIALS ACCORDION === */
+    .testimonials-section {
+      padding: calc(var(--space-xl) * 2) var(--space-xl);
+      background: var(--color-white);
+    }
+
+    .testimonials-section-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .testimonials-section-inner > h2 {
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      color: var(--color-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .testimonials-section-inner > p.section-lead {
+      text-align: center;
+      font-size: 1.05rem;
+      color: var(--color-text-light);
+      margin-bottom: var(--space-xl);
+      max-width: none;
+    }
+
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .accordion-item {
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+    }
+
+    .accordion-item.is-open {
+      border-color: var(--color-accent);
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: var(--space-lg) var(--space-xl);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background var(--transition-base);
+    }
+
+    .accordion-trigger:hover {
+      background: var(--color-light);
+    }
+
+    .accordion-item.is-open .accordion-trigger {
+      background: var(--color-light);
+    }
+
+    .accordion-author {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      flex: 1;
+    }
+
+    .accordion-preview {
+      font-size: 0.88rem;
+      color: var(--color-text-subtle);
+      font-style: italic;
+      flex: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 600px) {
+      .accordion-preview { display: none; }
+    }
+
+    .accordion-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--color-accent);
+      transition: transform 0.25s ease;
+    }
+
+    .accordion-item.is-open .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      display: none;
+      padding: var(--space-lg) var(--space-xl) var(--space-xl);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .accordion-item.is-open .accordion-body {
+      display: block;
+    }
+
+    .accordion-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--color-text-light);
+    }
+
+    .accordion-text p {
+      margin-bottom: var(--space-md);
+      max-width: none;
+    }
+
+    .accordion-text p:last-child { margin-bottom: 0; }
+
+    .accordion-highlight {
+      background: rgba(243, 156, 18, 0.12);
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
     /* === CTA SECTION === */
     .cta-section {
-      background: linear-gradient(135deg, var(--color-accent) 0%, #d68b00 100%);
+      background: linear-gradient(135deg, var(--color-accent) 0%, #c97d00 100%);
       color: var(--color-white);
-      padding: calc(var(--space-xl) * 2) var(--space-xl);
+      padding: calc(var(--space-xl) * 2.5) var(--space-xl);
       text-align: center;
     }
 
     .cta-content {
-      max-width: 700px;
+      max-width: 680px;
       margin: 0 auto;
     }
 
@@ -370,8 +512,8 @@
     }
 
     .cta-section p {
-      font-size: 1.15rem;
-      margin-bottom: var(--space-xl);
+      font-size: 1.1rem;
+      margin-bottom: var(--space-lg);
       color: rgba(255, 255, 255, 0.92);
       max-width: none;
     }
@@ -379,7 +521,7 @@
     .cta-section .g-btn {
       background: var(--color-white);
       color: var(--color-primary);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
     }
 
@@ -398,11 +540,26 @@
     <div class="g-container">
       <a href="index.html" class="g-page-header__brand-wrapper">
         <svg class="g-page-header__logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M20 34C20 34 5 24 5 13.5C5 9.36 8.58 6 12.75 6C15.6 6 18.1 7.55 19.5 9.85L20 10.7L20.5 9.85C21.9 7.55 24.4 6 27.25 6C31.42 6 35 9.36 35 13.5C35 24 20 34 20 34Z" fill="#F39C12"/>
+          <!-- Caterpillar head -->
+          <circle cx="9" cy="7" r="2.8" fill="currentColor"/>
+          <!-- Caterpillar body segments -->
+          <circle cx="9" cy="14" r="2.3" fill="currentColor"/>
+          <circle cx="10.5" cy="21" r="2.3" fill="currentColor"/>
+          <circle cx="14" cy="27" r="2.3" fill="currentColor"/>
+          <circle cx="19.5" cy="32" r="2.3" fill="currentColor"/>
+          <!-- Butterfly wing (open stroke, right side) -->
+          <path d="M22 9 C30 5 38 11 37 21 C36 29 30 36 22 37" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- Diagonal transformation accent -->
+          <path d="M28 11 L17 32" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.35"/>
         </svg>
         <span class="g-page-header__brand">Stefan Giesberg Lerncoaching</span>
       </a>
-      <nav class="g-page-header__nav">
+      <button class="nav-hamburger" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="g-page-header__nav" id="main-nav">
         <a href="index.html" class="active">Home</a>
         <a href="about.html">Über mich</a>
         <a href="testimonials.html">Erfahrungsberichte</a>
@@ -414,35 +571,38 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
-      <div class="hero-content">
-        <h1>Wenn hochbegabte Kinder Lese- und Schreibblockaden haben</h1>
-        <p>Ihr Kind vermeidet plötzlich das Lesen oder Schreiben? Zeigt LRS-ähnliche Symptome, obwohl klassische Förderung nicht wirkt? Das Problem ist oft nicht die Begabung – sondern eine ineffiziente Lerntechnik. Die lässt sich häufig in 1–2 Sitzungen deutlich verbessern.</p>
-        <a href="contact.html" class="g-btn g-btn--primary g-btn--lg">Kostenloses Erstgespräch</a>
-      </div>
-      <div class="hero-image-col">
-        <img src="assets/images/junge-dreirad-hero.png"
-             alt="Kind beim Lernen – das Dreirad-Phänomen"
-             style="width: 100%; border-radius: var(--border-radius-lg); box-shadow: 0 12px 40px rgba(0,0,0,0.35);">
+      <span class="hero-eyebrow">Lerncoaching für hochbegabte Kinder</span>
+      <h1>Was, wenn es kein LRS ist?</h1>
+      <p>Bei 8 von 10 hochbegabten Kindern mit Lese- und Schreibblockaden steckt kein klassisches LRS dahinter – sondern eine erlernte Lese- und Schreibblockade. In meiner Praxis mit über 20 Kindern hat ein einziger Termin meist gereicht, um das zu klären.</p>
+      <div class="cta-btn-group">
+        <a href="tel:+4917642405967" class="g-btn g-btn--primary g-btn--lg">Jetzt anrufen: +49 176 42405967</a>
+        <a href="contact.html" class="g-btn g-btn--outline">Kontaktformular</a>
       </div>
     </div>
   </section>
 
-  <!-- Dreirad-Phänomen -->
-  <section class="content-section">
-    <div class="section-inner">
-      <div class="section-grid">
-        <div>
-          <img src="assets/images/junge-dreirad.png"
-               alt="Junge auf Dreirad – Metapher für ineffiziente Lerntechniken"
-               style="width: 100%; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md);">
-        </div>
-        <div class="section-text">
-          <h2>Das Dreirad-Phänomen</h2>
-          <p>Stellen Sie sich vor: Ihr hochbegabtes Kind fährt auf einem Dreirad und versucht, mit anderen Kindern auf richtigen Fahrrädern Schritt zu halten. Es schafft das sogar – muss aber unglaublich viel mehr Energie aufwenden.</p>
-          <p>Genau das passiert beim <strong>Lesen und Schreiben</strong>: Hochbegabte Kinder bleiben oft bei Anfängertechniken hängen, weil sie Anweisungen zu genau befolgen. Das Ergebnis: unleserliche Schrift, Buchstabenverdrehungen, Abbrüche nach wenigen Wörtern – obwohl die Intelligenz vorhanden ist.</p>
-          <p><strong>Ich helfe Ihrem Kind beim Umstieg vom Dreirad auf das Fahrrad.</strong> Wer weiß – vielleicht wird es dann sogar ein Rennrad.</p>
-          <a href="contact.html" class="g-btn g-btn--primary">Kostenfreies Erstgespräch</a>
-        </div>
+  <!-- USP-Streifen -->
+  <section class="usp-section">
+    <div class="usp-inner">
+      <div class="usp-card">
+        <div class="usp-number">1 Termin</div>
+        <div class="usp-label">Beobachtung &amp; Korrektur</div>
+        <p>Einschätzung und erste Technikkorrektur in einem einzigen Gespräch – kein Warten zwischen Beobachtung und Lösung.</p>
+      </div>
+      <div class="usp-card">
+        <div class="usp-number">Auf Bedarf</div>
+        <div class="usp-label">Folgesitzungen</div>
+        <p>Weitere Sitzungen nur wenn sinnvoll – und nur dann berechnet. Kein offenes Therapieende.</p>
+      </div>
+      <div class="usp-card">
+        <div class="usp-number">100–300&nbsp;€</div>
+        <div class="usp-label">Gesamtinvestition</div>
+        <p>Transparente Kosten von Anfang an – statt monatelange Förderstunden ohne klares Ende.</p>
+      </div>
+      <div class="usp-card">
+        <div class="usp-number">Online</div>
+        <div class="usp-label">Per Videokonferenz</div>
+        <p>Bequem von zu Hause – kein Fahrtaufwand, flexible Terminwahl, deutschlandweit.</p>
       </div>
     </div>
   </section>
@@ -451,16 +611,16 @@
   <section class="konzept-section">
     <div class="konzept-inner">
       <div>
-        <h2>Das Konzept</h2>
-        <p>Hochbegabte Kinder lernen anders – aber die Grundschule lehrt alle gleich. Das Ergebnis: Kinder nutzen ineffiziente Lese- und Schreibtaktiken, die sie erschöpfen, obwohl sie hochintelligent sind.</p>
-        <p style="margin-top: var(--space-md);">Ich identifiziere und korrigiere diese didaktisch induzierten Fehlpassungen – keine jahrelange Therapie, sondern gezielte Taktik-Korrektur, meist in 2–3 Sitzungen.</p>
+        <h2>Warum es kein LRS sein muss</h2>
+        <p>Klassisches LRS ist neurologisch bedingt – das ist bei hochbegabten Kindern mit Lese- und Schreibproblemen selten der Fall. Stattdessen folgen viele Hochbegabte Grundschulanleitungen besonders präzise und verfestigen dabei Anfängertechniken, die beim Tempo ihrer Gedanken nicht mehr funktionieren.</p>
+        <p style="margin-top: var(--space-md);">Das Ergebnis sieht aus wie LRS: keine Lust auf Lesen, Buchstabenverdrehungen – selbst trotz LRS-Förderung. Ist es aber nicht. Ich erkenne diese <strong>didaktisch induzierten Fehlpassungen</strong> und korrigiere sie direkt – ohne Diagnose-Odyssee.</p>
       </div>
       <div class="konzept-card">
         <h4>Mein Ansatz vs. klassische LRS-Förderung</h4>
         <table class="konzept-table">
           <tr>
             <td>Dauer</td>
-            <td>2–3 Sitzungen statt 6–24 Monate</td>
+            <td>1–3 Termine statt 6–24 Monate</td>
           </tr>
           <tr>
             <td>Methode</td>
@@ -472,9 +632,12 @@
           </tr>
           <tr>
             <td>Investition</td>
-            <td>100–300 € Gesamtkosten</td>
+            <td>100–300&nbsp;€ Gesamtkosten</td>
           </tr>
         </table>
+        <div style="margin-top: var(--space-xl);">
+          <a href="tel:+4917642405967" class="g-btn g-btn--outline" style="border-color: rgba(255,255,255,0.5); color: var(--color-white);">Jetzt anrufen: +49 176 42405967</a>
+        </div>
       </div>
     </div>
   </section>
@@ -487,8 +650,8 @@
         <div class="fuerwen-box yes">
           <h3>✓ Mein Coaching passt, wenn Ihr Kind…</h3>
           <ul class="fuerwen-list">
-            <li>hochbegabt ist und plötzlich Lesen oder Schreiben vermeidet</li>
-            <li>LRS-ähnliche Symptome zeigt (unleserliche Schrift, Buchstabenverdrehungen, Abbrüche)</li>
+            <li>hochbegabt ist und Lesen oder Schreiben vermeidet oder verweigert</li>
+            <li>Buchstabenverdrehungen zeigt – selbst trotz laufender LRS-Förderung</li>
             <li>nach Hausaufgaben völlig erschöpft ist, obwohl es intelligent ist</li>
             <li>bereits klassische Förderung bekommt, die nicht wirkt</li>
           </ul>
@@ -498,10 +661,13 @@
           <ul class="fuerwen-list">
             <li>klassische LRS-Therapie (z.B. phonologisches Training)</li>
             <li>allgemeine Nachhilfe oder Hausaufgabenbetreuung</li>
-            <li>langfristige, prozessbegleitende Therapie</li>
+            <li>langfristige, prozessbegleitende Förderung</li>
           </ul>
-          <p class="fuerwen-note">Bei Unsicherheit: Einfach das kostenlose Erstgespräch nutzen – gemeinsam klären wir, ob mein Ansatz passt.</p>
+          <p class="fuerwen-note">Bei Unsicherheit: Einfach anrufen – gemeinsam klären wir, ob mein Ansatz passt.</p>
         </div>
+      </div>
+      <div style="text-align: center; margin-top: var(--space-xl);">
+        <a href="tel:+4917642405967" class="g-btn g-btn--primary">Jetzt anrufen: +49 176 42405967</a>
       </div>
     </div>
   </section>
@@ -510,25 +676,117 @@
   <section class="steps-section">
     <div class="section-inner">
       <div class="steps-header">
-        <span class="overline">Mein Angebot für Ihr Kind</span>
+        <span class="overline">Mein Vorgehen</span>
         <h2>So arbeite ich</h2>
       </div>
       <div class="steps-grid">
         <div class="step-card">
           <div class="step-number">1</div>
-          <h3>Videokonferenz-Diagnostik</h3>
-          <p>Im persönlichen Gespräch beobachte ich, wie Ihr Kind liest und schreibt. Durch sensibles Nachfragen entschlüssele ich: Was passiert in seinem Kopf? Welche Technik nutzt es? Wo liegt die Blockade?</p>
+          <h3>Beobachtung</h3>
+          <p>Im Videogespräch schaue ich zu, wie Ihr Kind liest und schreibt. Durch gezieltes Nachfragen entschlüssle ich: Was passiert in seinem Kopf? Welche Technik nutzt es – und wo liegt die Blockade?</p>
         </div>
         <div class="step-card">
           <div class="step-number">2</div>
-          <h3>Individuelle Lösung</h3>
-          <p>Jedes Kind ist anders – deshalb entwickle ich eine passende Strategie. Oft genügen 1–2 Sitzungen für deutliche Fortschritte. Ich arbeite mit personalisierten Übungen, die genau auf Ihr Kind zugeschnitten sind.</p>
+          <h3>Gemeinsame Einschätzung</h3>
+          <p>Nach der Beobachtungsphase erkläre ich Ihnen als Eltern, was ich gesehen habe. Gemeinsam entscheiden wir, ob mein Ansatz zu Ihrem Kind passt.</p>
+          <p class="step-note">Erst dann beginnt die Intervention – und erst dann wird abgerechnet.</p>
         </div>
         <div class="step-card">
           <div class="step-number">3</div>
+          <h3>Technikkorrektur</h3>
+          <p>Wenn wir gemeinsam entscheiden, weiterzumachen: gezielte Korrektur der Lerntechnik noch im selben Termin. Individuell, ohne Schema-F – oft reicht dieser eine Impuls für deutliche Fortschritte.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
           <h3>Übungen für zu Hause</h3>
           <p>Ihr Kind bekommt klare, einfache Übungen mit – oft mit viel Spaß verbunden. So verfestigt sich die neue Technik im Alltag. Ich bleibe bei Bedarf für Rückfragen erreichbar.</p>
         </div>
+      </div>
+      <div style="text-align: center; margin-top: calc(var(--space-xl) * 1.5);">
+        <a href="tel:+4917642405967" class="g-btn g-btn--primary g-btn--lg">Jetzt anrufen: +49 176 42405967</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Erfahrungsberichte -->
+  <section class="testimonials-section">
+    <div class="testimonials-section-inner">
+      <h2>Was Eltern berichten</h2>
+      <p class="section-lead">Authentische Erfahrungen – anonym und unverändert.</p>
+
+      <div class="accordion">
+
+        <div class="accordion-item is-open">
+          <button class="accordion-trigger" aria-expanded="true">
+            <span class="accordion-author">Mutter einer hochbegabten Tochter</span>
+            <span class="accordion-preview">„…so wertvoll für uns, da sie jetzt gute Impulse hat…"</span>
+            <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-text">
+              <p>Lieber Stefan, danke dir für diese Stunde mit unserer Tochter. Du hast es schnell geschafft Vertrauen zu ihr aufzubauen, so dass sie sich wohl gefühlt hat. Dein genaues Nachfragen und Verstehen wollen, was genau in ihrem Kopf passiert, hat am Ende dazu geführt ihre Gedanken und Vorgehensweise beim Lesen so zu verstehen und zu entschlüsseln, dass sich auf einmal ganz viele Stolpersteine, die sich vorab gezeigt haben, verständlich waren. Warum verdreht sie Buchstaben, warum bricht sie nach 2 Silben ab und meint sie kann das Wort nicht lesen…</p>
+              <p>Mit deiner Erfahrung hast du dann ihr und uns kleine Übungen und Ideen mitgegeben, wie wir jetzt neue Strukturen mit ihr üben können. <span class="accordion-highlight">Es ist so wertvoll für uns, da sie jetzt mit guten Impulsen und Strategien das Lesen weiter für sich lernen kann.</span> Wir haben mit den Übungen zu Hause außerdem eine Menge Spaß, weil sie sie so gerne macht und sich an ihren Lernfortschritten so freut. Vielen lieben Dank!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="accordion-author">Heike &amp; Lukas mit Anton</span>
+            <span class="accordion-preview">„…schon mit nur zwei Impulsen konnte Stefan Anton deutlich helfen…"</span>
+            <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-text">
+              <p>Als Eltern eines hochbegabten Kindes mit besonderen Lernbedürfnissen haben wir lange erlebt, wie schwierig das bestehende Schulsystem für Kinder wie unseren Sohn Anton sein kann. Trotz hoher Begabung stößt man immer wieder an Grenzen und ein Wechsel zwischen Über- &amp; Unterforderung des Kindes macht es nicht leicht. Wir waren lange hilflos und auf der intensiven Suche nach einer Unterstützung, die wirklich passt.</p>
+              <p><span class="accordion-highlight">Mit Stefan haben wir diese Unterstützung endlich gefunden und können nun sagen: Er war unsere Rettung.</span> Stefan weiß aus eigener Erfahrung, was Hochbegabung bedeutet, und versteht die besonderen Herausforderungen, die hochbegabte Schüler*innen im Schulalltag erleben.</p>
+              <p><span class="accordion-highlight">Schon mit nur zwei Impulsen konnte Stefan Anton dabei helfen, seine offensichtliche Lese-Rechtschreib-Schwäche deutlich zu verbessern.</span> Diese schnellen Fortschritte haben uns tief beeindruckt und vor allem Anton selbst enorm gestärkt. Anton hat in nur 3 Monaten und 2 Terminen bessere Leistungen und mehr Selbstvertrauen entwickelt.</p>
+              <p>Der Kontakt mit Stefan ist dabei immer sympathisch, humorvoll und herzlich – man merkt wie sehr ihm die Kinder am Herzen liegen. Wir können Stefan jeder Familie, die nach passgenauer Unterstützung sucht, empfehlen.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="accordion-author">Mutter eines hochbegabten Sohnes</span>
+            <span class="accordion-preview">„…eigentlich ist der Nachteilsausgleich jetzt nicht mehr notwendig…"</span>
+            <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-text">
+              <p>Wir haben nach dem Termin mit Stefan über 10 Tage täglich ein Schleichdiktat gemacht. <span class="accordion-highlight">Zu meinem Erstaunen hat sich das zuvor schwer leserliche Schriftbild innerhalb weniger Tage deutlich verbessert. Auch die Anzahl der Rechtschreibfehler hat sich deutlich reduziert.</span></p>
+              <p>Wir hatten gerade erst einen Nachteilsausgleich erwirkt und im nächsten Deutschtest gab es plötzlich nur noch zwei Fehler im Abschreibtext (vorher war eigentlich kein Wort richtig geschrieben). <span class="accordion-highlight">Eigentlich ist der Nachteilsausgleich jetzt nicht mehr notwendig. Ich kann es kaum glauben, dass unser Problem so schnell gelöst ist.</span> Tatsächlich ist das Thema LRS für uns kaum noch relevant. Das ist echt verrückt.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="accordion-author">Eltern einer hochbegabten Tochter</span>
+            <span class="accordion-preview">„…ruhige, zugewandte und individuelle Herangehensweise als große Stärke…"</span>
+            <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-text">
+              <p>Stefan hat sich bei seinem Besuch außergewöhnlich viel Zeit genommen und ist sehr feinfühlig auf unsere Tochter eingegangen. <span class="accordion-highlight">Gerade im Umgang mit hochbegabten Kindern haben wir seine ruhige, zugewandte und individuelle Herangehensweise als große Stärke erlebt.</span></p>
+              <p>Besonders im Bereich Lesen konnten wir dank seiner Methoden deutliche Fortschritte beobachten. Techniken wie Blitzlesen oder das Lesen in Sinnabschnitten waren für unsere Tochter gut zugänglich und haben ihre Lesequalität spürbar verbessert.</p>
+              <p>Insgesamt haben wir Stefan als sehr engagiert, fachlich fundiert und kindzentriert erlebt. Besonders wertvoll war für uns die Kombination aus klaren, strukturierten Methoden und einer Haltung, die das Kind in seiner Persönlichkeit respektiert.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align: center; margin-top: var(--space-xl);">
+        <a href="testimonials.html" style="font-size: 0.9rem; color: var(--color-text-subtle); text-decoration: underline;">Alle Erfahrungsberichte lesen</a>
       </div>
     </div>
   </section>
@@ -536,9 +794,13 @@
   <!-- CTA -->
   <section class="cta-section">
     <div class="cta-content">
-      <h2>Bereit für den Wechsel vom Dreirad zum Fahrrad?</h2>
-      <p>Vereinbaren Sie jetzt ein kostenloses Erstgespräch und finden Sie heraus, wie Ihr Kind mit weniger Aufwand bessere Ergebnisse erzielen kann.</p>
-      <a href="contact.html" class="g-btn g-btn--lg">Jetzt Termin vereinbaren</a>
+      <h2>Könnte es bei Ihrem Kind auch eine Technikblockade sein?</h2>
+      <p>Finden Sie es in einem kurzen Gespräch heraus. Erst wenn mein Ansatz passt, beginnt die Intervention – und wird auch erst dann berechnet.</p>
+      <div class="cta-phone-number">+49 176 42405967</div>
+      <div class="cta-btn-group">
+        <a href="tel:+4917642405967" class="g-btn g-btn--lg">Jetzt anrufen</a>
+        <a href="contact.html" class="g-btn g-btn--lg" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: var(--color-white);">Kontaktformular</a>
+      </div>
     </div>
   </section>
 
@@ -548,7 +810,7 @@
       <div class="g-footer__content">
         <div class="g-footer__section">
           <h3>Stefan Giesberg Lerncoaching</h3>
-          <p>Spezialisiert auf hochbegabte Kinder mit Lese- und Schreibblockaden – Quick-Fix statt jahrelanger Therapie.</p>
+          <p>Spezialisiert auf hochbegabte Kinder mit Lese- und Schreibblockaden – Einschätzung und Korrektur in einem einzigen Termin.</p>
         </div>
         <div class="g-footer__section">
           <h4>Navigation</h4>
@@ -558,16 +820,63 @@
           <a href="contact.html">Kontakt</a>
         </div>
         <div class="g-footer__section">
+          <h4>Kontakt</h4>
+          <a href="tel:+4917642405967">+49 176 42405967</a>
+          <a href="mailto:stefan@stefangiesberg.de">stefan@stefangiesberg.de</a>
+        </div>
+        <div class="g-footer__section">
           <h4>Rechtliches</h4>
           <a href="impressum.html">Impressum</a>
           <a href="datenschutz.html">Datenschutz</a>
         </div>
       </div>
       <div class="g-footer__bottom">
-        <p>&copy; 2026 Stefan Giesberg Lerncoaching | <a href="mailto:stefan@stefangiesberg.de">stefan@stefangiesberg.de</a></p>
+        <p>&copy; 2026 Stefan Giesberg Lerncoaching</p>
       </div>
     </div>
   </footer>
 
+  <script>
+    // Hamburger nav
+    (function () {
+      var btn = document.querySelector('.nav-hamburger');
+      var nav = document.querySelector('.g-page-header__nav');
+      if (!btn || !nav) return;
+      btn.addEventListener('click', function () {
+        var open = nav.classList.toggle('nav-open');
+        btn.classList.toggle('nav-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.g-page-header')) {
+          nav.classList.remove('nav-open');
+          btn.classList.remove('nav-open');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.setAttribute('aria-label', 'Menü öffnen');
+        }
+      });
+    })();
+
+    // Accordion
+    (function () {
+      document.querySelectorAll('.accordion-trigger').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+          var item = this.closest('.accordion-item');
+          var isOpen = item.classList.contains('is-open');
+          // Close all
+          document.querySelectorAll('.accordion-item').forEach(function (el) {
+            el.classList.remove('is-open');
+            el.querySelector('.accordion-trigger').setAttribute('aria-expanded', 'false');
+          });
+          // Open clicked if it was closed
+          if (!isOpen) {
+            item.classList.add('is-open');
+            this.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

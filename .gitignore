@@ -1,22 +1,14 @@
-# OS
+# WordPress-Backup (nur lokale Referenz)
+website-wordpress-backup/
+
+# Office-Dokumente mit sensiblen Inhalten
+docs/*.docx
+docs/*.xlsx
+
+# macOS
 .DS_Store
-Thumbs.db
 
-# IDE
-.vscode/
-.idea/
-
-# Dependencies
+# Build-Artefakte
 node_modules/
-
-# Build
 dist/
-
-# Environment
-.env
-.env.local
-
-# Analyse-Output (lokal generiert)
-output_analysis/
-*.pyc
-__pycache__/
+*.log
