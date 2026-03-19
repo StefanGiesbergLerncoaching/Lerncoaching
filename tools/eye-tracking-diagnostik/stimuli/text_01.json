@@ -1,0 +1,16 @@
+{
+  "id": "baseline_01",
+  "title": "Das kleine Kaninchen",
+  "difficulty": "leicht",
+  "words": [
+    "Das", "kleine", "Kaninchen", "hüpfte", "über", "die", "Wiese.",
+    "Es", "fand", "eine", "orangefarbene", "Karotte", "im", "Gras.",
+    "Glücklich", "knabberte", "es", "die", "Karotte", "und", 
+    "dachte", "dabei", "an", "seine", "Familie."
+  ],
+  "text_formatted": [
+    "Das kleine Kaninchen hüpfte über die Wiese.",
+    "Es fand eine orangefarbene Karotte im Gras.",
+    "Glücklich knabberte es die Karotte und dachte dabei an seine Familie."
+  ]
+}

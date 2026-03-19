@@ -1,0 +1,15 @@
+{
+  "id": "baseline_03",
+  "title": "Der Apfelbaum",
+  "difficulty": "leicht",
+  "words": [
+    "Im", "Garten", "steht", "ein", "alter", "Apfelbaum.",
+    "Seine", "Äste", "hängen", "voller", "roter", "Früchte.",
+    "Jeden", "Herbst", "pflücken", "wir", "die", "süßen", "Äpfel."
+  ],
+  "text_formatted": [
+    "Im Garten steht ein alter Apfelbaum.",
+    "Seine Äste hängen voller roter Früchte.",
+    "Jeden Herbst pflücken wir die süßen Äpfel."
+  ]
+}

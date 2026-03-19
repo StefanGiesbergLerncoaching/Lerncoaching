@@ -1,0 +1,23 @@
+/* Oberlängen-Hack für Intervention */
+
+.text-stimulus.oberlaengen .word {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    height: 0.55em;  /* 55% der Buchstabenhöhe sichtbar */
+    margin-right: 0.35em;
+    vertical-align: baseline;
+}
+
+/* Verschiedene Schwierigkeitsgrade */
+.text-stimulus.oberlaengen.leicht .word {
+    height: 0.65em;  /* 65% sichtbar - leichter */
+}
+
+.text-stimulus.oberlaengen.standard .word {
+    height: 0.55em;  /* 55% sichtbar - standard */
+}
+
+.text-stimulus.oberlaengen.schwer .word {
+    height: 0.45em;  /* 45% sichtbar - schwer */
+}

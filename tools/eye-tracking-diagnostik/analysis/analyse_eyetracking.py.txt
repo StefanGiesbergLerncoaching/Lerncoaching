@@ -1,0 +1,710 @@
+#!/usr/bin/env python3
+"""
+Eye-Tracking Analyse-Script v2.0
+Analysiert die 3 CSV-Dateien aus dem Multi-Line-Tracking-System
+Erstellt Visualisierungen und diagnostische Reports
+"""
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+import sys
+from datetime import datetime
+
+# Matplotlib-Backend für Nicht-GUI-Umgebungen
+plt.switch_backend('Agg')
+
+# Seaborn-Stil setzen
+sns.set_style("whitegrid")
+sns.set_palette("husl")
+
+
+class EyeTrackingAnalyzer:
+    """Hauptklasse für Eye-Tracking-Datenanalyse"""
+    
+    def __init__(self, line1_path, line2_path, line3_path):
+        """
+        Initialisiert den Analyzer mit den 3 CSV-Pfaden
+        
+        Args:
+            line1_path: Pfad zu line1_vertical.csv
+            line2_path: Pfad zu line2_syllables.csv
+            line3_path: Pfad zu line3_words.csv
+        """
+        self.line1_path = Path(line1_path)
+        self.line2_path = Path(line2_path)
+        self.line3_path = Path(line3_path)
+        
+        # DataFrames
+        self.line1_df = None
+        self.line2_df = None
+        self.line3_df = None
+        
+        # Metadaten
+        self.participant_id = None
+        self.date = None
+        self.text_id = None
+        
+        # Ergebnisse
+        self.statistics = {}
+        self.classification = None
+        
+    def load_data(self):
+        """Lädt alle 3 CSV-Dateien"""
+        print("📂 Lade CSV-Dateien...")
+        
+        # Zeile 1: Vertical Tracking
+        self.line1_df = pd.read_csv(
+            self.line1_path, 
+            comment='#',
+            skipinitialspace=True
+        )
+        
+        # Zeile 2: Syllable Tracking
+        self.line2_df = pd.read_csv(
+            self.line2_path, 
+            comment='#',
+            skipinitialspace=True
+        )
+        
+        # Zeile 3: Standard Word Tracking
+        self.line3_df = pd.read_csv(
+            self.line3_path, 
+            comment='#',
+            skipinitialspace=True
+        )
+        
+        # Metadaten aus erster Datei extrahieren
+        with open(self.line1_path, 'r') as f:
+            for line in f:
+                if line.startswith('# Participant ID:'):
+                    self.participant_id = line.split(':')[1].strip()
+                elif line.startswith('# Date:'):
+                    self.date = line.split(':', 1)[1].strip()
+                elif line.startswith('# Text:'):
+                    self.text_id = line.split(':')[1].strip()
+        
+        print(f"✅ Daten geladen: {self.participant_id}")
+        print(f"   Zeile 1: {len(self.line1_df)} Chunks")
+        print(f"   Zeile 2: {len(self.line2_df)} Silben")
+        print(f"   Zeile 3: {len(self.line3_df)} Wörter")
+        
+    def calculate_statistics(self):
+        """Berechnet deskriptive Statistiken für alle 3 Zeilen"""
+        print("\n📊 Berechne Statistiken...")
+        
+        stats = {}
+        
+        # ===== ZEILE 1: VERTICAL TRACKING =====
+        line1_valid = self.line1_df[self.line1_df['skipped'] == 0]
+        
+        if len(line1_valid) > 0:
+            stats['line1'] = {
+                'total_chunks': len(self.line1_df),
+                'read_chunks': len(line1_valid),
+                'skip_rate': (self.line1_df['skipped'].sum() / len(self.line1_df)) * 100,
+                'mean_FFD': line1_valid['FFD'].mean() if line1_valid['FFD'].notna().any() else 0,
+                'mean_TRT': line1_valid['TRT'].mean(),
+                'mean_fixations': line1_valid['fixation_count'].mean(),
+                'mean_revisits': line1_valid['revisits'].mean(),
+                'mean_top_ratio': line1_valid['top_ratio'].mean() if line1_valid['top_ratio'].notna().any() else 0.5,
+                'top_duration': line1_valid['top_duration'].sum(),
+                'bottom_duration': line1_valid['bottom_duration'].sum()
+            }
+        else:
+            stats['line1'] = self._empty_line_stats()
+        
+        # ===== ZEILE 2: SYLLABLE TRACKING =====
+        line2_valid = self.line2_df[self.line2_df['skipped'] == 0]
+        
+        if len(line2_valid) > 0:
+            # Jump-Distance-Statistiken
+            jump_distances = line2_valid['jump_distance'].dropna()
+            
+            stats['line2'] = {
+                'total_syllables': len(self.line2_df),
+                'read_syllables': len(line2_valid),
+                'skip_rate': (self.line2_df['skipped'].sum() / len(self.line2_df)) * 100,
+                'mean_FFD': line2_valid['FFD'].mean() if line2_valid['FFD'].notna().any() else 0,
+                'mean_jump_distance': jump_distances.mean() if len(jump_distances) > 0 else 1.0,
+                'median_jump_distance': jump_distances.median() if len(jump_distances) > 0 else 1.0,
+                'max_jump_distance': jump_distances.max() if len(jump_distances) > 0 else 1,
+                'regressions': (jump_distances < 0).sum() if len(jump_distances) > 0 else 0,
+                'progressions': (jump_distances > 0).sum() if len(jump_distances) > 0 else 0
+            }
+        else:
+            stats['line2'] = self._empty_line_stats()
+        
+        # ===== ZEILE 3: STANDARD WORD TRACKING =====
+        line3_valid = self.line3_df[self.line3_df['skipped'] == 0]
+        
+        if len(line3_valid) > 0:
+            stats['line3'] = {
+                'total_words': len(self.line3_df),
+                'read_words': len(line3_valid),
+                'skip_rate': (self.line3_df['skipped'].sum() / len(self.line3_df)) * 100,
+                'mean_FFD': line3_valid['FFD'].mean() if line3_valid['FFD'].notna().any() else 0,
+                'mean_TRT': line3_valid['TRT'].mean(),
+                'mean_fixations': line3_valid['fixation_count'].mean(),
+                'mean_revisits': line3_valid['revisits'].mean(),
+                'mean_left_ratio': line3_valid['left_ratio'].mean() if line3_valid['left_ratio'].notna().any() else 0.5,
+                'mean_top_ratio': line3_valid['top_ratio'].mean() if line3_valid['top_ratio'].notna().any() else 0.5
+            }
+        else:
+            stats['line3'] = self._empty_line_stats()
+        
+        self.statistics = stats
+        
+        print("✅ Statistiken berechnet")
+        
+    def _empty_line_stats(self):
+        """Gibt leere Statistiken zurück, wenn keine Daten vorhanden sind"""
+        return {
+            'note': 'Keine validen Daten (alle Wörter übersprungen)',
+            'skip_rate': 100.0
+        }
+        
+    def classify_reader_profile(self):
+        """
+        Klassifiziert den Leser-Typ basierend auf den Metriken
+        
+        Returns:
+            dict mit Klassifikation und Scores
+        """
+        print("\n🔍 Klassifiziere Leserprofil...")
+        
+        scores = {
+            'decoder': 0,
+            'guesser': 0,
+            'compensator': 0
+        }
+        
+        # Wenn zu wenig Daten: Keine Klassifikation
+        if (self.statistics['line1'].get('skip_rate', 100) > 80 and
+            self.statistics['line2'].get('skip_rate', 100) > 80 and
+            self.statistics['line3'].get('skip_rate', 100) > 80):
+            
+            self.classification = {
+                'profile': 'unknown',
+                'confidence': 0.0,
+                'reason': 'Zu wenig Daten (>80% Skip-Rate in allen Zeilen)',
+                'scores': scores
+            }
+            print("⚠️  Warnung: Zu wenig Daten für Klassifikation!")
+            return self.classification
+        
+        # ===== DEKODIERER-INDIKATOREN =====
+        # 1. Lange FFD (First Fixation Duration)
+        if self.statistics['line3'].get('mean_FFD', 0) > 300:
+            scores['decoder'] += 2
+        elif self.statistics['line3'].get('mean_FFD', 0) > 250:
+            scores['decoder'] += 1
+        
+        # 2. Viele Fixationen pro Wort
+        if self.statistics['line3'].get('mean_fixations', 0) > 3:
+            scores['decoder'] += 2
+        elif self.statistics['line3'].get('mean_fixations', 0) > 2:
+            scores['decoder'] += 1
+        
+        # 3. Ausgeglichene Top/Bottom-Ratio (nutzt alle Buchstaben)
+        top_ratio_line1 = self.statistics['line1'].get('mean_top_ratio', 0.5)
+        if 0.45 <= top_ratio_line1 <= 0.55:
+            scores['decoder'] += 2
+        
+        # 4. Links-betonte Fixationen (Wortanfang)
+        left_ratio = self.statistics['line3'].get('mean_left_ratio', 0.5)
+        if left_ratio > 0.55:
+            scores['decoder'] += 1
+        
+        # 5. Niedrige Skip-Rate
+        if self.statistics['line3'].get('skip_rate', 100) < 10:
+            scores['decoder'] += 2
+        
+        # ===== RATER-INDIKATOREN =====
+        # 1. Kurze FFD
+        if self.statistics['line3'].get('mean_FFD', 0) < 200:
+            scores['guesser'] += 2
+        
+        # 2. Hohe Skip-Rate
+        if self.statistics['line3'].get('skip_rate', 0) > 30:
+            scores['guesser'] += 3
+        elif self.statistics['line3'].get('skip_rate', 0) > 20:
+            scores['guesser'] += 2
+        
+        # 3. Top-betonte Fixationen (nur Oberlängen)
+        if top_ratio_line1 > 0.60:
+            scores['guesser'] += 2
+        
+        # 4. Große Sprünge bei Silben
+        mean_jump = self.statistics['line2'].get('mean_jump_distance', 1.0)
+        if mean_jump > 2.0:
+            scores['guesser'] += 2
+        elif mean_jump > 1.5:
+            scores['guesser'] += 1
+        
+        # 5. Wenige Fixationen pro Wort
+        if self.statistics['line3'].get('mean_fixations', 0) < 2:
+            scores['guesser'] += 1
+        
+        # ===== KOMPENSATOR-INDIKATOREN =====
+        # 1. Viele Revisits (Rücksprünge)
+        if self.statistics['line3'].get('mean_revisits', 0) > 1:
+            scores['compensator'] += 3
+        elif self.statistics['line3'].get('mean_revisits', 0) > 0.5:
+            scores['compensator'] += 2
+        
+        # 2. Regressionen bei Silben
+        regressions = self.statistics['line2'].get('regressions', 0)
+        if regressions > 2:
+            scores['compensator'] += 2
+        elif regressions > 0:
+            scores['compensator'] += 1
+        
+        # 3. Hohe TRT trotz normaler FFD
+        ffd = self.statistics['line3'].get('mean_FFD', 0)
+        trt = self.statistics['line3'].get('mean_TRT', 0)
+        if trt > ffd * 2 and ffd < 300:
+            scores['compensator'] += 2
+        
+        # 4. Mittlere Skip-Rate (selektives Überspringen)
+        skip_rate = self.statistics['line3'].get('skip_rate', 0)
+        if 10 <= skip_rate <= 30:
+            scores['compensator'] += 1
+        
+        # ===== KLASSIFIKATION =====
+        max_score = max(scores.values())
+        
+        if max_score == 0:
+            profile = 'unknown'
+            confidence = 0.0
+            reason = "Keine eindeutigen Indikatoren gefunden"
+        else:
+            total_score = sum(scores.values())
+            profile = max(scores, key=scores.get)
+            confidence = scores[profile] / total_score if total_score > 0 else 0.0
+            
+            # Profil-Beschreibungen
+            descriptions = {
+                'decoder': 'Langsames, gründliches Dekodieren (jeder Buchstabe wird gelesen)',
+                'guesser': 'Schnelles Raten/Überfliegen (nur Oberlängen/Wortformen)',
+                'compensator': 'Kompensationsstrategien (viele Rücksprünge, Nachkorrekturen)'
+            }
+            reason = descriptions[profile]
+        
+        self.classification = {
+            'profile': profile,
+            'confidence': confidence,
+            'reason': reason,
+            'scores': scores
+        }
+        
+        print(f"✅ Klassifikation: {profile.upper()} (Konfidenz: {confidence*100:.1f}%)")
+        print(f"   Scores - Decoder: {scores['decoder']}, Guesser: {scores['guesser']}, Compensator: {scores['compensator']}")
+        
+        return self.classification
+        
+    def create_visualizations(self, output_dir='.'):
+        """
+        Erstellt alle Visualisierungen
+        
+        Args:
+            output_dir: Verzeichnis für Output-Dateien
+        """
+        print(f"\n📊 Erstelle Visualisierungen in {output_dir}...")
+        
+        output_path = Path(output_dir)
+        output_path.mkdir(exist_ok=True)
+        
+        # 1. Zeile 1: Top/Bottom-Verteilung
+        self._plot_vertical_distribution(output_path)
+        
+        # 2. Zeile 2: Silben-Sequenz
+        self._plot_syllable_sequence(output_path)
+        
+        # 3. Zeile 3: Regionen-Heatmap
+        self._plot_regions_heatmap(output_path)
+        
+        # 4. Zusammenfassung: Profil-Radar-Chart
+        self._plot_profile_radar(output_path)
+        
+        # 5. Statistik-Übersicht
+        self._plot_statistics_summary(output_path)
+        
+        print("✅ Visualisierungen erstellt")
+        
+    def _plot_vertical_distribution(self, output_path):
+        """Plot: Oben/Unten-Verteilung (Zeile 1)"""
+        line1_valid = self.line1_df[self.line1_df['skipped'] == 0]
+        
+        if len(line1_valid) == 0:
+            print("⚠️  Keine Daten für Vertical Distribution Plot")
+            return
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        x = range(len(line1_valid))
+        width = 0.35
+        
+        ax.bar([i - width/2 for i in x], line1_valid['top_duration'], 
+               width, label='Oben (Oberlängen)', color='#3498db')
+        ax.bar([i + width/2 for i in x], line1_valid['bottom_duration'], 
+               width, label='Unten (Unterlängen)', color='#e74c3c')
+        
+        ax.set_xlabel('Chunk', fontsize=12)
+        ax.set_ylabel('Fixationsdauer (ms)', fontsize=12)
+        ax.set_title('Zeile 1: Oberlängen vs. Unterlängen-Nutzung', fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(line1_valid['text'], rotation=45, ha='right')
+        ax.legend()
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(output_path / 'line1_vertical_distribution.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        
+    def _plot_syllable_sequence(self, output_path):
+        """Plot: Silben-Lesereihenfolge (Zeile 2)"""
+        line2_valid = self.line2_df[self.line2_df['skipped'] == 0]
+        
+        if len(line2_valid) == 0:
+            print("⚠️  Keine Daten für Syllable Sequence Plot")
+            return
+        
+        # Sortiert nach read_order
+        line2_sorted = line2_valid.sort_values('read_order')
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        # Linie zeichnen
+        ax.plot(line2_sorted['read_order'], line2_sorted['syl_id'], 
+                marker='o', linestyle='-', linewidth=2, markersize=8, color='#2ecc71')
+        
+        # Ideale Sequenz (diagonal)
+        ideal_x = range(len(line2_sorted))
+        ideal_y = line2_sorted['syl_id'].values
+        ax.plot(ideal_x, ideal_y, linestyle='--', color='gray', alpha=0.5, label='Ideale Sequenz')
+        
+        ax.set_xlabel('Lesereihenfolge (zeitlich)', fontsize=12)
+        ax.set_ylabel('Silben-ID', fontsize=12)
+        ax.set_title('Zeile 2: Silben-Lesereihenfolge', fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        
+        plt.tight_layout()
+        plt.savefig(output_path / 'line2_syllable_sequence.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        
+    def _plot_regions_heatmap(self, output_path):
+        """Plot: 4-Regionen-Heatmap (Zeile 3)"""
+        line3_valid = self.line3_df[self.line3_df['skipped'] == 0]
+        
+        if len(line3_valid) == 0:
+            print("⚠️  Keine Daten für Regions Heatmap")
+            return
+        
+        # Matrix erstellen: Wörter × Regionen
+        regions = ['top_left', 'top_right', 'bottom_left', 'bottom_right']
+        region_labels = ['Oben Links', 'Oben Rechts', 'Unten Links', 'Unten Rechts']
+        
+        data = []
+        for _, row in line3_valid.iterrows():
+            data.append([row['tl_dur'], row['tr_dur'], row['bl_dur'], row['br_dur']])
+        
+        data = np.array(data)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        im = ax.imshow(data.T, cmap='YlOrRd', aspect='auto')
+        
+        # Achsen
+        ax.set_xticks(range(len(line3_valid)))
+        ax.set_xticklabels(line3_valid['word'], rotation=45, ha='right')
+        ax.set_yticks(range(4))
+        ax.set_yticklabels(region_labels)
+        
+        # Colorbar
+        cbar = plt.colorbar(im, ax=ax)
+        cbar.set_label('Fixationsdauer (ms)', rotation=270, labelpad=20)
+        
+        # Titel
+        ax.set_title('Zeile 3: Regionen-Heatmap (4-Regionen pro Wort)', 
+                     fontsize=14, fontweight='bold')
+        
+        plt.tight_layout()
+        plt.savefig(output_path / 'line3_regions_heatmap.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        
+    def _plot_profile_radar(self, output_path):
+        """Plot: Leserprofil-Radar-Chart"""
+        if self.classification is None:
+            self.classify_reader_profile()
+        
+        scores = self.classification['scores']
+        
+        categories = ['Decoder', 'Guesser', 'Compensator']
+        values = [scores['decoder'], scores['guesser'], scores['compensator']]
+        
+        # Radar-Chart erstellen
+        angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
+        values += values[:1]  # Schließen des Polygons
+        angles += angles[:1]
+        
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+        
+        ax.plot(angles, values, 'o-', linewidth=2, color='#3498db')
+        ax.fill(angles, values, alpha=0.25, color='#3498db')
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(categories, fontsize=12)
+        ax.set_ylim(0, max(values) + 1)
+        ax.grid(True)
+        
+        # Titel
+        profile_name = self.classification['profile'].capitalize()
+        confidence = self.classification['confidence'] * 100
+        ax.set_title(f'Leserprofil: {profile_name}\n(Konfidenz: {confidence:.1f}%)', 
+                     fontsize=14, fontweight='bold', pad=20)
+        
+        plt.tight_layout()
+        plt.savefig(output_path / 'profile_radar.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        
+    def _plot_statistics_summary(self, output_path):
+        """Plot: Statistik-Zusammenfassung"""
+        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        fig.suptitle('Statistik-Zusammenfassung', fontsize=16, fontweight='bold')
+        
+        # Plot 1: Skip-Rates
+        ax1 = axes[0, 0]
+        lines = ['Zeile 1\n(Vertical)', 'Zeile 2\n(Syllables)', 'Zeile 3\n(Words)']
+        skip_rates = [
+            self.statistics['line1'].get('skip_rate', 100),
+            self.statistics['line2'].get('skip_rate', 100),
+            self.statistics['line3'].get('skip_rate', 100)
+        ]
+        ax1.bar(lines, skip_rates, color=['#3498db', '#2ecc71', '#e74c3c'])
+        ax1.set_ylabel('Skip-Rate (%)', fontsize=12)
+        ax1.set_title('Übersprungene Wörter/Silben', fontsize=12, fontweight='bold')
+        ax1.set_ylim(0, 100)
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # Plot 2: Mean FFD
+        ax2 = axes[0, 1]
+        ffd_values = [
+            self.statistics['line1'].get('mean_FFD', 0),
+            self.statistics['line2'].get('mean_FFD', 0),
+            self.statistics['line3'].get('mean_FFD', 0)
+        ]
+        ax2.bar(lines, ffd_values, color=['#3498db', '#2ecc71', '#e74c3c'])
+        ax2.set_ylabel('FFD (ms)', fontsize=12)
+        ax2.set_title('Durchschnittliche First Fixation Duration', fontsize=12, fontweight='bold')
+        ax2.grid(axis='y', alpha=0.3)
+        
+        # Plot 3: Fixation Count (nur Zeile 1 & 3)
+        ax3 = axes[1, 0]
+        fix_counts = [
+            self.statistics['line1'].get('mean_fixations', 0),
+            self.statistics['line3'].get('mean_fixations', 0)
+        ]
+        ax3.bar(['Zeile 1', 'Zeile 3'], fix_counts, color=['#3498db', '#e74c3c'])
+        ax3.set_ylabel('Fixationen pro Wort', fontsize=12)
+        ax3.set_title('Durchschnittliche Fixationsanzahl', fontsize=12, fontweight='bold')
+        ax3.grid(axis='y', alpha=0.3)
+        
+        # Plot 4: Top vs. Left Ratio
+        ax4 = axes[1, 1]
+        ratios = [
+            self.statistics['line1'].get('mean_top_ratio', 0.5),
+            self.statistics['line3'].get('mean_left_ratio', 0.5),
+            self.statistics['line3'].get('mean_top_ratio', 0.5)
+        ]
+        labels = ['Top Ratio\n(Zeile 1)', 'Left Ratio\n(Zeile 3)', 'Top Ratio\n(Zeile 3)']
+        colors = ['#3498db', '#e74c3c', '#f39c12']
+        ax4.bar(labels, ratios, color=colors)
+        ax4.set_ylabel('Ratio (0-1)', fontsize=12)
+        ax4.set_title('Räumliche Fixations-Verteilung', fontsize=12, fontweight='bold')
+        ax4.set_ylim(0, 1)
+        ax4.axhline(0.5, color='gray', linestyle='--', alpha=0.5, label='Ausgeglichen')
+        ax4.legend()
+        ax4.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(output_path / 'statistics_summary.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        
+    def generate_report(self, output_path='.'):
+        """Generiert einen Textreport mit allen Ergebnissen"""
+        output_path = Path(output_path)
+        report_file = output_path / f'report_{self.participant_id}.txt'
+        
+        print(f"\n📝 Erstelle Report: {report_file}")
+        
+        with open(report_file, 'w', encoding='utf-8') as f:
+            f.write("="*70 + "\n")
+            f.write("EYE-TRACKING ANALYSE REPORT\n")
+            f.write("="*70 + "\n\n")
+            
+            f.write(f"Participant ID: {self.participant_id}\n")
+            f.write(f"Date: {self.date}\n")
+            f.write(f"Text: {self.text_id}\n")
+            f.write(f"Report generiert: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            
+            f.write("="*70 + "\n")
+            f.write("LESERPROFIL-KLASSIFIKATION\n")
+            f.write("="*70 + "\n\n")
+            
+            if self.classification:
+                profile_names = {
+                    'decoder': 'DEKODIERER',
+                    'guesser': 'RATER/GUESSER',
+                    'compensator': 'KOMPENSATOR',
+                    'unknown': 'UNBEKANNT'
+                }
+                
+                f.write(f"Profil: {profile_names[self.classification['profile']]}\n")
+                f.write(f"Konfidenz: {self.classification['confidence']*100:.1f}%\n")
+                f.write(f"Begründung: {self.classification['reason']}\n\n")
+                
+                f.write("Scores:\n")
+                for profile, score in self.classification['scores'].items():
+                    f.write(f"  - {profile.capitalize()}: {score}\n")
+            
+            f.write("\n" + "="*70 + "\n")
+            f.write("ZEILE 1: VERTICAL TRACKING (Oberlängen-Analyse)\n")
+            f.write("="*70 + "\n\n")
+            
+            self._write_line_stats(f, self.statistics['line1'], 'vertical')
+            
+            f.write("\n" + "="*70 + "\n")
+            f.write("ZEILE 2: SYLLABLE TRACKING (Silben-Sequenz)\n")
+            f.write("="*70 + "\n\n")
+            
+            self._write_line_stats(f, self.statistics['line2'], 'syllables')
+            
+            f.write("\n" + "="*70 + "\n")
+            f.write("ZEILE 3: STANDARD WORD TRACKING (4-Regionen)\n")
+            f.write("="*70 + "\n\n")
+            
+            self._write_line_stats(f, self.statistics['line3'], 'words')
+            
+            f.write("\n" + "="*70 + "\n")
+            f.write("INTERPRETATION\n")
+            f.write("="*70 + "\n\n")
+            
+            self._write_interpretation(f)
+        
+        print(f"✅ Report erstellt: {report_file}")
+        
+    def _write_line_stats(self, f, stats, line_type):
+        """Schreibt Statistiken für eine Zeile in den Report"""
+        if 'note' in stats:
+            f.write(f"⚠️  {stats['note']}\n")
+            f.write(f"Skip-Rate: {stats['skip_rate']:.1f}%\n")
+            return
+        
+        f.write(f"Skip-Rate: {stats.get('skip_rate', 0):.1f}%\n")
+        
+        if line_type == 'vertical':
+            f.write(f"Gelesene Chunks: {stats.get('read_chunks', 0)}/{stats.get('total_chunks', 0)}\n")
+            f.write(f"Mean FFD: {stats.get('mean_FFD', 0):.1f} ms\n")
+            f.write(f"Mean TRT: {stats.get('mean_TRT', 0):.1f} ms\n")
+            f.write(f"Mean Fixationen: {stats.get('mean_fixations', 0):.2f}\n")
+            f.write(f"Mean Revisits: {stats.get('mean_revisits', 0):.2f}\n")
+            f.write(f"Top-Ratio: {stats.get('mean_top_ratio', 0.5):.3f} (0.5 = ausgeglichen)\n")
+            f.write(f"  → Top-Duration: {stats.get('top_duration', 0)} ms\n")
+            f.write(f"  → Bottom-Duration: {stats.get('bottom_duration', 0)} ms\n")
+            
+        elif line_type == 'syllables':
+            f.write(f"Gelesene Silben: {stats.get('read_syllables', 0)}/{stats.get('total_syllables', 0)}\n")
+            f.write(f"Mean FFD: {stats.get('mean_FFD', 0):.1f} ms\n")
+            f.write(f"Mean Jump-Distance: {stats.get('mean_jump_distance', 1.0):.2f} Silben\n")
+            f.write(f"Median Jump-Distance: {stats.get('median_jump_distance', 1.0):.2f} Silben\n")
+            f.write(f"Max Jump-Distance: {stats.get('max_jump_distance', 1)}\n")
+            f.write(f"Regressionen: {stats.get('regressions', 0)} (Rücksprünge)\n")
+            f.write(f"Progressionen: {stats.get('progressions', 0)} (Vorwärts)\n")
+            
+        elif line_type == 'words':
+            f.write(f"Gelesene Wörter: {stats.get('read_words', 0)}/{stats.get('total_words', 0)}\n")
+            f.write(f"Mean FFD: {stats.get('mean_FFD', 0):.1f} ms\n")
+            f.write(f"Mean TRT: {stats.get('mean_TRT', 0):.1f} ms\n")
+            f.write(f"Mean Fixationen: {stats.get('mean_fixations', 0):.2f}\n")
+            f.write(f"Mean Revisits: {stats.get('mean_revisits', 0):.2f}\n")
+            f.write(f"Left-Ratio: {stats.get('mean_left_ratio', 0.5):.3f} (>0.55 = Wortanfang-Fokus)\n")
+            f.write(f"Top-Ratio: {stats.get('mean_top_ratio', 0.5):.3f} (>0.60 = Oberlängen-Fokus)\n")
+    
+    def _write_interpretation(self, f):
+        """Schreibt diagnostische Interpretation"""
+        if self.classification['profile'] == 'decoder':
+            f.write("DEKODIERER-PROFIL:\n")
+            f.write("- Langsames, gründliches Lesen\n")
+            f.write("- Jeder Buchstabe wird verarbeitet\n")
+            f.write("- Ausgeglichene Nutzung von Ober-/Unterlängen\n")
+            f.write("- Niedrige Skip-Rate\n")
+            f.write("- Empfehlung: Flüssigkeitstraining, Blitzlesen\n\n")
+            
+        elif self.classification['profile'] == 'guesser':
+            f.write("RATER-PROFIL:\n")
+            f.write("- Schnelles Überfliegen/Raten\n")
+            f.write("- Nur Wortformen und Oberlängen genutzt\n")
+            f.write("- Hohe Skip-Rate\n")
+            f.write("- Risiko: Verständnisprobleme bei komplexen Texten\n")
+            f.write("- Empfehlung: Gezielte Dekodierungsübungen, Leetspeak-Intervention\n\n")
+            
+        elif self.classification['profile'] == 'compensator':
+            f.write("KOMPENSATOR-PROFIL:\n")
+            f.write("- Viele Rücksprünge und Korrekturen\n")
+            f.write("- Hoher kognitiver Aufwand\n")
+            f.write("- Versucht Verständnisprobleme zu kompensieren\n")
+            f.write("- Empfehlung: Arbeitsgedächtnistraining, strukturierte Lesetrainings\n\n")
+            
+        else:
+            f.write("⚠️  WARNUNG: Zu wenig Daten für valide Klassifikation\n")
+            f.write("Mögliche Ursachen:\n")
+            f.write("- Kalibrierung war ungenau\n")
+            f.write("- Zu schnelles Lesen (Speedreading)\n")
+            f.write("- Technische Probleme (Webcam-Positionierung)\n")
+            f.write("- Empfehlung: Test mit besseren Bedingungen wiederholen\n\n")
+
+
+def main():
+    """Hauptfunktion"""
+    print("="*70)
+    print("EYE-TRACKING ANALYSE v2.0")
+    print("="*70 + "\n")
+    
+    # Argumente parsen
+    if len(sys.argv) < 4:
+        print("Usage: python analyze_eyetracking.py <line1.csv> <line2.csv> <line3.csv>")
+        print("\nExample:")
+        print("  python analyze_eyetracking.py line1_vertical_123.csv line2_syllables_123.csv line3_words_123.csv")
+        sys.exit(1)
+    
+    line1_path = sys.argv[1]
+    line2_path = sys.argv[2]
+    line3_path = sys.argv[3]
+    
+    # Analyzer initialisieren
+    analyzer = EyeTrackingAnalyzer(line1_path, line2_path, line3_path)
+    
+    # Pipeline ausführen
+    analyzer.load_data()
+    analyzer.calculate_statistics()
+    analyzer.classify_reader_profile()
+    analyzer.create_visualizations(output_dir='output_analysis')
+    analyzer.generate_report(output_path='output_analysis')
+    
+    print("\n" + "="*70)
+    print("✅ ANALYSE ABGESCHLOSSEN!")
+    print("="*70)
+    print("\nDateien erstellt:")
+    print("  - output_analysis/line1_vertical_distribution.png")
+    print("  - output_analysis/line2_syllable_sequence.png")
+    print("  - output_analysis/line3_regions_heatmap.png")
+    print("  - output_analysis/profile_radar.png")
+    print("  - output_analysis/statistics_summary.png")
+    print(f"  - output_analysis/report_{analyzer.participant_id}.txt")
+
+
+if __name__ == '__main__':
+    main()

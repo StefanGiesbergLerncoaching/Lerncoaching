@@ -1,601 +1,918 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oberlängen-Text-Generator | Giesberg Diagnostik</title>
-  <link rel="stylesheet" href="../../shared/css/giesberg-design.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oberlängen-Text-Generator | Diagnostik-Tool</title>
+      <link rel="stylesheet" href="../../shared/css/giesberg-design.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700<style>display=swap" rel="stylesheet">
   <style>
-    /* Tool-spezifische Styles (minimal, baut auf Design-System) */
-    .tool-container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: var(--space-xl);
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .controls-panel {
-      background: var(--color-white);
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: var(--space-xl);
-      margin-bottom: var(--space-xl);
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .control-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: var(--space-lg);
-    }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
 
-    .value-badge {
-      display: inline-flex;
-      align-items: center;
-      background: var(--color-primary);
-      color: var(--color-white);
-      padding: 2px 12px;
-      border-radius: 999px;
-      font-size: var(--font-size-sm);
-      font-weight: 600;
-      min-width: 55px;
-      text-align: center;
-    }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-    .replacements-panel {
-      background: var(--color-white);
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: var(--space-xl);
-      margin-bottom: var(--space-xl);
-    }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-    .replacement-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: var(--space-md);
-    }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
 
-    .replacement-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      cursor: pointer;
-    }
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
 
-    .replacement-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      accent-color: var(--color-primary);
-    }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
 
-    .custom-replacements {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-md);
-      margin-top: var(--space-lg);
-      padding-top: var(--space-lg);
-      border-top: 1px solid var(--color-border);
-    }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    .custom-replacement-row {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-    }
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .custom-replacement-row input[type="text"] {
-      width: 55px;
-      padding: var(--space-xs) var(--space-sm);
-      border: 2px solid var(--color-border);
-      border-radius: var(--border-radius);
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      text-align: center;
-    }
+        .value-display {
+            background: #667eea;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
 
-    .custom-replacement-row input[type="text"]:focus {
-      border-color: var(--color-primary);
-      outline: none;
-    }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
 
-    .shuffle-toggle {
-      background: var(--color-accent-light);
-      border: 2px solid var(--color-accent);
-      border-radius: var(--border-radius-lg);
-      padding: var(--space-md) var(--space-lg);
-      margin-bottom: var(--space-xl);
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-    }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .shuffle-toggle input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      cursor: pointer;
-      accent-color: var(--color-accent);
-    }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #764ba2;
+            transform: scale(1.2);
+        }
 
-    .shuffle-toggle label {
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--color-accent-hover);
-    }
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
 
-    .shuffle-toggle .hint {
-      font-size: var(--font-size-sm);
-      color: var(--color-accent-hover);
-      opacity: 0.8;
-    }
+        input[type="number"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
 
-    .button-bar {
-      display: flex;
-      gap: var(--space-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--space-xl);
-    }
+        select {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
 
-    .preview-panel {
-      background: var(--color-white);
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: var(--space-xl);
-    }
+        select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
 
-    .preview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-lg);
-      padding-bottom: var(--space-md);
-      border-bottom: 1px solid var(--color-border);
-    }
+        select:hover {
+            border-color: #adb5bd;
+        }
 
-    .preview-header h2 {
-      margin-bottom: 0;
-    }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
 
-    .preview-stats {
-      color: var(--color-text-light);
-      font-size: var(--font-size-sm);
-    }
+        textarea:focus {
+            border-color: #667eea;
+            outline: none;
+        }
 
-    .preview-text {
-      font-family: 'Arial', sans-serif;
-      color: #000;
-      line-height: 1.8;
-      padding: var(--space-lg);
-      background: var(--color-light);
-      border-radius: var(--border-radius);
-      min-height: 250px;
-    }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-    .clipped-text {
-      display: inline-block;
-      transition: clip-path 0.3s ease;
-    }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* Format-Toolbar */
-    .format-toolbar {
-      display: flex;
-      gap: 4px;
-      padding: var(--space-sm);
-      background: var(--color-light);
-      border-radius: var(--border-radius);
-      margin-bottom: var(--space-sm);
-      flex-wrap: wrap;
-      align-items: center;
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
 
-    .format-btn {
-      min-width: 36px;
-      height: 32px;
-      padding: 4px 8px;
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      background: var(--color-white);
-      cursor: pointer;
-      font-size: 0.95em;
-      transition: all var(--transition-fast);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
 
-    .format-btn:hover {
-      background: var(--color-light);
-      border-color: var(--color-primary);
-    }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
 
-    .format-divider {
-      width: 1px;
-      height: 24px;
-      background: var(--color-border);
-      margin: 0 4px;
-    }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
 
-    .format-hint {
-      flex: 1;
-      text-align: right;
-      font-size: var(--font-size-sm);
-      color: var(--color-text-subtle);
-    }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
 
-    .g-textarea--code {
-      font-family: var(--font-mono);
-      font-size: 0.95rem;
-      min-height: 140px;
-    }
+        .btn-success:hover {
+            background: #218838;
+        }
 
-    /* Print */
-    @media print {
-      body { background: white; padding: 0; }
-      .g-page-header, .controls-panel, .replacements-panel,
-      .shuffle-toggle, .button-bar, .preview-header,
-      .g-footer, .g-no-print { display: none !important; }
-      .preview-panel { box-shadow: none; padding: 20px; }
-      .preview-text { background: white; }
-      .tool-container { padding: 0; }
-      .print-footer {
-        display: block !important;
-        position: fixed;
-        bottom: 20px;
-        left: 0; right: 0;
-        text-align: center;
-        font-size: 10pt;
-        color: #666;
-        border-top: 1px solid #ddd;
-        padding-top: 10px;
-      }
-    }
+        .preview-section {
+            padding: 40px;
+            min-height: 400px;
+            background: white;
+        }
 
-    .print-footer { display: none; }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
 
-    @media (max-width: 768px) {
-      .button-bar { flex-direction: column; }
-      .button-bar .g-btn { width: 100%; justify-content: center; }
-    }
-  </style>
+        .preview-header h2 {
+            color: #495057;
+            font-size: 1.8em;
+        }
+
+        .preview-text {
+            font-family: 'Arial', sans-serif;
+            color: #000;
+            line-height: 1.8;
+            overflow: hidden;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+
+        .clipped-text {
+            display: inline-block;
+            transition: clip-path 0.3s ease;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-box strong {
+            color: #0c5460;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header, .controls {
+                display: none;
+            }
+            .preview-section {
+                padding: 20px;
+                padding-bottom: 60px;
+            }
+            .preview-header {
+                display: none;
+            }
+            .preview-text {
+                background: white;
+            }
+            .print-footer {
+                display: block !important;
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            @page {
+                margin-top: 0;
+            }
+        }
+
+        .print-footer {
+            display: none;
+        }
+
+        .format-btn {
+            min-width: 40px;
+            height: 35px;
+            padding: 5px 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .format-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .format-btn:active {
+            transform: translateY(0);
+            background: #dee2e6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Header -->
-  <header class="g-page-header">
-    <div class="g-container">
-      <div class="g-page-header__brand">Giesberg Diagnostik</div>
-      <h1>Oberl&auml;ngen-Text-Generator</h1>
-      <p>Diagnostik-Tool f&uuml;r okulomotorische Untersuchungen bei hochbegabten Kindern</p>
-      <nav class="g-page-header__nav">
-        <a href="../../portal/index.html">&larr; Zur&uuml;ck zum Portal</a>
-        <a href="#" class="active">Oberl&auml;ngen-Generator</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="tool-container">
-
-    <!-- Info -->
-    <div class="g-info g-info--tip">
-      <strong>Hinweis:</strong> Der Regler steuert, wie viel vom Buchstaben <strong>oben</strong> sichtbar bleibt.
-      Bei 50% wird die untere H&auml;lfte abgeschnitten, bei 100% ist alles sichtbar, bei 30% nur der oberste Teil.
-    </div>
-
-    <!-- Controls -->
-    <div class="controls-panel">
-      <div class="control-grid">
-        <div class="g-form-group">
-          <label class="g-label">
-            Sichtbarer Anteil (oben)
-            <span class="value-badge" id="clipValue">100%</span>
-          </label>
-          <input type="range" class="g-range" id="clipSlider" min="0" max="100" value="100" step="1">
+    <div class="container">
+        <div class="header">
+            <h1>📊 Oberlängen-Text-Generator</h1>
+            <p>Diagnostik-Tool für okulomotorische Untersuchungen bei hochbegabten Kindern</p>
         </div>
 
-        <div class="g-form-group">
-          <label class="g-label">Schriftgr&ouml;&szlig;e (px)</label>
-          <input type="number" class="g-input" id="fontSize" min="12" max="72" value="24" step="2">
+        <div class="controls">
+            <div class="info-box">
+                <strong>💡 Hinweis:</strong> Der Regler steuert, wie viel vom Buchstaben <strong>oben</strong> sichtbar bleibt. 
+                Bei 50% wird die untere Hälfte abgeschnitten, bei 100% ist alles sichtbar, bei 30% nur der oberste Teil.
+            </div>
+
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>
+                        Sichtbarer Anteil (oben)
+                        <span class="value-display" id="clipValue">100%</span>
+                    </label>
+                    <input type="range" id="clipSlider" min="0" max="100" value="100" step="1">
+                </div>
+
+                <div class="control-group">
+                    <label>Schriftgröße (px)</label>
+                    <input type="number" id="fontSize" min="12" max="72" value="24" step="2">
+                </div>
+
+                <div class="control-group">
+                    <label>Zeilenabstand</label>
+                    <input type="number" id="lineHeight" min="1" max="3" value="1.8" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <label>Wortabstand (em)</label>
+                    <input type="number" id="wordSpacing" min="0" max="2" value="0" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <label>Schriftart</label>
+                    <select id="fontFamily">
+                        <option value="Arial, sans-serif">Arial (Standard)</option>
+                        <option value="'Times New Roman', serif">Times New Roman (Serif)</option>
+                        <option value="'Courier New', monospace">Courier New (Monospace)</option>
+                        <option value="Georgia, serif">Georgia (Serif)</option>
+                        <option value="Verdana, sans-serif">Verdana (Sans-Serif)</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans MS (Kindgerecht)</option>
+                        <option value="Tahoma, sans-serif">Tahoma</option>
+                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                        <option value="'Lucida Console', monospace">Lucida Console</option>
+                        <option value="Impact, fantasy">Impact (Fett)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group" style="margin-top: 20px;">
+                <label>Eingabetext</label>
+                
+                <!-- Formatierungs-Toolbar -->
+                <div style="display: flex; gap: 5px; margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px; flex-wrap: wrap;">
+                    <button type="button" onclick="formatText('bold')" class="format-btn" title="Fett (Strg+B)">
+                        <strong>B</strong>
+                    </button>
+                    <button type="button" onclick="formatText('italic')" class="format-btn" title="Kursiv (Strg+I)">
+                        <em>I</em>
+                    </button>
+                    <button type="button" onclick="formatText('underline')" class="format-btn" title="Unterstrichen (Strg+U)">
+                        <u>U</u>
+                    </button>
+                    <button type="button" onclick="formatText('bold-italic')" class="format-btn" title="Fett+Kursiv">
+                        <strong><em>BI</em></strong>
+                    </button>
+                    <div style="width: 2px; height: 30px; background: #dee2e6; margin: 0 5px;"></div>
+                    <button type="button" onclick="insertLineBreak()" class="format-btn" title="Zeilenumbruch">
+                        ↵
+                    </button>
+                    <button type="button" onclick="insertParagraph()" class="format-btn" title="Neuer Absatz">
+                        ¶
+                    </button>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 10px; color: #6c757d; font-size: 0.85em;">
+                        <span>Markdown: **fett** *kursiv* __unterstrichen__</span>
+                    </div>
+                </div>
+                
+                <textarea id="inputText" placeholder="Gib hier deinen Text ein... 
+
+Markdown-Formatierung:
+**fett** *kursiv* __unterstrichen__ ***fett+kursiv***
+Doppelter Enter = neuer Absatz">Der Fuchs ruht. Die Katze springt hoch. Ein junger Adler schwebt majestätisch über den glitzernden Bergseen, während unten im Tal die fleißigen Bauern ihre Felder bestellen. Plötzlich erscheint am Horizont ein mysteriöses Leuchten, das die neugierigen Wissenschaftler in höchste Alarmbereitschaft versetzt und komplexe Untersuchungen erforderlich macht. Die interdisziplinäre Forschungsgruppe analysierte systematisch sämtliche atmosphärischen Phänomene, wobei sie methodologische Herausforderungen überwinden musste, die selbst erfahrene Meteorologen vor ungeahnte Schwierigkeiten stellten.</textarea>
+            </div>
+
+            <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 2px solid #dee2e6;">
+                <h3 style="margin-bottom: 15px; color: #495057;">🔤 Buchstaben-Ersetzungen</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_e" class="replace-checkbox">
+                        <span>e → 3</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_a" class="replace-checkbox">
+                        <span>a → 4</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_i" class="replace-checkbox">
+                        <span>i → 1</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_o" class="replace-checkbox">
+                        <span>o → 0</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_s" class="replace-checkbox">
+                        <span>s → 5</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="replace_t" class="replace-checkbox">
+                        <span>t → 7</span>
+                    </label>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+                    <h4 style="margin-bottom: 15px; color: #495057;">Eigene Ersetzungen</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="text" id="custom_from_1" maxlength="5" placeholder="von" style="width: 60px; padding: 8px; border: 2px solid #dee2e6; border-radius: 6px;">
+                            <span>→</span>
+                            <input type="text" id="custom_to_1" maxlength="5" placeholder="nach" style="width: 60px; padding: 8px; border: 2px solid #dee2e6; border-radius: 6px;">
+                            <input type="checkbox" id="custom_active_1" class="replace-checkbox">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="text" id="custom_from_2" maxlength="5" placeholder="von" style="width: 60px; padding: 8px; border: 2px solid #dee2e6; border-radius: 6px;">
+                            <span>→</span>
+                            <input type="text" id="custom_to_2" maxlength="5" placeholder="nach" style="width: 60px; padding: 8px; border: 2px solid #dee2e6; border-radius: 6px;">
+                            <input type="checkbox" id="custom_active_2" class="replace-checkbox">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border: 2px solid #ffc107;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <input type="checkbox" id="shuffleToggle" style="width: 24px; height: 24px; cursor: pointer;">
+                    <label for="shuffleToggle" style="cursor: pointer; font-weight: 600; color: #856404; font-size: 1.1em; margin: 0;">
+                        🔀 Buchstaben mischen (erster und letzter bleiben fix)
+                    </label>
+                </div>
+                <p style="margin-top: 10px; margin-bottom: 0; color: #856404; font-size: 0.9em;">
+                    Beispiel: "Wort" wird zu "Wrot" | "Beispiel" wird zu "Bsieiepl"
+                </p>
+            </div>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <button class="btn-primary" onclick="updatePreview()">
+                    🔄 Vorschau aktualisieren
+                </button>
+                <button class="btn-success" onclick="window.print()">
+                    🖨️ Als PDF drucken
+                </button>
+                <button class="btn-secondary" onclick="resetDefaults()">
+                    ↺ Zurücksetzen
+                </button>
+            </div>
         </div>
 
-        <div class="g-form-group">
-          <label class="g-label">Zeilenabstand</label>
-          <input type="number" class="g-input" id="lineHeight" min="1" max="3" value="1.8" step="0.1">
+        <div class="preview-section">
+            <div class="preview-header">
+                <h2>Live-Vorschau</h2>
+                <div style="color: #6c757d; font-size: 0.9em;">
+                    <span id="statsDisplay">Bereit</span>
+                </div>
+            </div>
+            <div class="preview-text" id="previewText">
+                Hier erscheint die Vorschau deines Textes...
+            </div>
+            <div class="print-footer">
+                © stefangiesberg.de | Stefan Giesberg
+            </div>
         </div>
-
-        <div class="g-form-group">
-          <label class="g-label">Wortabstand (em)</label>
-          <input type="number" class="g-input" id="wordSpacing" min="0" max="2" value="0" step="0.1">
-        </div>
-
-        <div class="g-form-group">
-          <label class="g-label">Schriftart</label>
-          <select class="g-select" id="fontFamily">
-            <option value="Arial, sans-serif">Arial (Standard)</option>
-            <option value="'Times New Roman', serif">Times New Roman</option>
-            <option value="'Courier New', monospace">Courier New</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="Verdana, sans-serif">Verdana</option>
-            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
-            <option value="Tahoma, sans-serif">Tahoma</option>
-            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Eingabetext -->
-      <div class="g-form-group g-mt-lg">
-        <label class="g-label">Eingabetext</label>
-        <div class="format-toolbar">
-          <button type="button" onclick="formatText('bold')" class="format-btn" title="Fett (Strg+B)"><strong>B</strong></button>
-          <button type="button" onclick="formatText('italic')" class="format-btn" title="Kursiv (Strg+I)"><em>I</em></button>
-          <button type="button" onclick="formatText('underline')" class="format-btn" title="Unterstrichen (Strg+U)"><u>U</u></button>
-          <button type="button" onclick="formatText('bold-italic')" class="format-btn" title="Fett+Kursiv"><strong><em>BI</em></strong></button>
-          <div class="format-divider"></div>
-          <button type="button" onclick="insertLineBreak()" class="format-btn" title="Zeilenumbruch">&crarr;</button>
-          <button type="button" onclick="insertParagraph()" class="format-btn" title="Neuer Absatz">&para;</button>
-          <span class="format-hint">Markdown: **fett** *kursiv* __unterstrichen__</span>
-        </div>
-        <textarea class="g-textarea g-textarea--code" id="inputText" placeholder="Text eingeben...&#10;&#10;Markdown: **fett** *kursiv* __unterstrichen__ ***fett+kursiv***">Der Fuchs ruht. Die Katze springt hoch. Ein junger Adler schwebt majestätisch über den glitzernden Bergseen, während unten im Tal die fleißigen Bauern ihre Felder bestellen. Plötzlich erscheint am Horizont ein mysteriöses Leuchten, das die neugierigen Wissenschaftler in höchste Alarmbereitschaft versetzt und komplexe Untersuchungen erforderlich macht.</textarea>
-      </div>
     </div>
 
-    <!-- Ersetzungen -->
-    <div class="replacements-panel">
-      <h3 class="g-mb-md">Buchstaben-Ersetzungen</h3>
-      <div class="replacement-grid">
-        <label class="replacement-item"><input type="checkbox" id="replace_e" class="replace-checkbox"> <span>e &rarr; 3</span></label>
-        <label class="replacement-item"><input type="checkbox" id="replace_a" class="replace-checkbox"> <span>a &rarr; 4</span></label>
-        <label class="replacement-item"><input type="checkbox" id="replace_i" class="replace-checkbox"> <span>i &rarr; 1</span></label>
-        <label class="replacement-item"><input type="checkbox" id="replace_o" class="replace-checkbox"> <span>o &rarr; 0</span></label>
-        <label class="replacement-item"><input type="checkbox" id="replace_s" class="replace-checkbox"> <span>s &rarr; 5</span></label>
-        <label class="replacement-item"><input type="checkbox" id="replace_t" class="replace-checkbox"> <span>t &rarr; 7</span></label>
-      </div>
-      <div class="custom-replacements">
-        <div class="custom-replacement-row">
-          <input type="text" id="custom_from_1" maxlength="5" placeholder="von">
-          <span>&rarr;</span>
-          <input type="text" id="custom_to_1" maxlength="5" placeholder="nach">
-          <input type="checkbox" id="custom_active_1" class="replace-checkbox">
-        </div>
-        <div class="custom-replacement-row">
-          <input type="text" id="custom_from_2" maxlength="5" placeholder="von">
-          <span>&rarr;</span>
-          <input type="text" id="custom_to_2" maxlength="5" placeholder="nach">
-          <input type="checkbox" id="custom_active_2" class="replace-checkbox">
-        </div>
-      </div>
-    </div>
+    <script>
+        // Variablen
+        const clipSlider = document.getElementById('clipSlider');
+        const clipValue = document.getElementById('clipValue');
+        const fontSize = document.getElementById('fontSize');
+        const lineHeight = document.getElementById('lineHeight');
+        const wordSpacing = document.getElementById('wordSpacing');
+        const fontFamily = document.getElementById('fontFamily');
+        const inputText = document.getElementById('inputText');
+        const previewText = document.getElementById('previewText');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const scrambleToggle = document.getElementById('scrambleToggle');
+        
+        // Ersetzungs-Checkboxen
+        const replaceCheckboxes = document.querySelectorAll('.replace-checkbox');
+        const shuffleToggle = document.getElementById('shuffleToggle');
 
-    <!-- Shuffle -->
-    <div class="shuffle-toggle">
-      <input type="checkbox" id="shuffleToggle">
-      <div>
-        <label for="shuffleToggle">Buchstaben mischen (erster und letzter bleiben fix)</label>
-        <div class="hint">Beispiel: &ldquo;Wort&rdquo; &rarr; &ldquo;Wrot&rdquo; | &ldquo;Beispiel&rdquo; &rarr; &ldquo;Bsieiepl&rdquo;</div>
-      </div>
-    </div>
+        // Event Listeners
+        clipSlider.addEventListener('input', function() {
+            clipValue.textContent = this.value + '%';
+            updatePreview();
+        });
 
-    <!-- Buttons -->
-    <div class="button-bar">
-      <button class="g-btn g-btn--primary" onclick="updatePreview()">Vorschau aktualisieren</button>
-      <button class="g-btn g-btn--secondary" onclick="window.print()">Als PDF drucken</button>
-      <button class="g-btn g-btn--outline" onclick="resetDefaults()">Zur&uuml;cksetzen</button>
-    </div>
+        fontSize.addEventListener('input', updatePreview);
+        lineHeight.addEventListener('input', updatePreview);
+        wordSpacing.addEventListener('input', updatePreview);
+        fontFamily.addEventListener('change', updatePreview);
+        inputText.addEventListener('input', updatePreview);
+        shuffleToggle.addEventListener('change', updatePreview);
+        
+        // Event Listener für alle Ersetzungs-Checkboxen
+        replaceCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updatePreview);
+        });
+        
+        // Event Listener für Custom-Felder
+        ['custom_from_1', 'custom_to_1', 'custom_from_2', 'custom_to_2'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
 
-    <!-- Preview -->
-    <div class="preview-panel">
-      <div class="preview-header">
-        <h2>Live-Vorschau</h2>
-        <span class="preview-stats" id="statsDisplay">Bereit</span>
-      </div>
-      <div class="preview-text" id="previewText">
-        Hier erscheint die Vorschau deines Textes...
-      </div>
-      <div class="print-footer">&copy; stefangiesberg.de | Stefan Giesberg</div>
-    </div>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="g-footer g-no-print">
-    <div class="g-container">
-      <p>&copy; 2026 Stefan Giesberg | <a href="../../portal/index.html">Zur&uuml;ck zum Portal</a></p>
-    </div>
-  </footer>
-
-  <script>
-    // === VARIABLEN ===
-    const clipSlider = document.getElementById('clipSlider');
-    const clipValue = document.getElementById('clipValue');
-    const fontSize = document.getElementById('fontSize');
-    const lineHeight = document.getElementById('lineHeight');
-    const wordSpacing = document.getElementById('wordSpacing');
-    const fontFamily = document.getElementById('fontFamily');
-    const inputText = document.getElementById('inputText');
-    const previewText = document.getElementById('previewText');
-    const statsDisplay = document.getElementById('statsDisplay');
-    const replaceCheckboxes = document.querySelectorAll('.replace-checkbox');
-    const shuffleToggle = document.getElementById('shuffleToggle');
-
-    // === EVENT LISTENERS ===
-    clipSlider.addEventListener('input', function() {
-      clipValue.textContent = this.value + '%';
-      updatePreview();
-    });
-    fontSize.addEventListener('input', updatePreview);
-    lineHeight.addEventListener('input', updatePreview);
-    wordSpacing.addEventListener('input', updatePreview);
-    fontFamily.addEventListener('change', updatePreview);
-    inputText.addEventListener('input', updatePreview);
-    shuffleToggle.addEventListener('change', updatePreview);
-    replaceCheckboxes.forEach(cb => cb.addEventListener('change', updatePreview));
-    ['custom_from_1','custom_to_1','custom_from_2','custom_to_2'].forEach(id =>
-      document.getElementById(id).addEventListener('input', updatePreview)
-    );
-
-    // Keyboard Shortcuts
-    inputText.addEventListener('keydown', function(e) {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'b') { e.preventDefault(); formatText('bold'); }
-        else if (e.key === 'i') { e.preventDefault(); formatText('italic'); }
-        else if (e.key === 'u') { e.preventDefault(); formatText('underline'); }
-      }
-    });
-
-    // === FORMATIERUNG ===
-    function formatText(type) {
-      const ta = inputText;
-      const start = ta.selectionStart, end = ta.selectionEnd;
-      const sel = ta.value.substring(start, end);
-      if (!sel.length) { alert('Bitte markiere zuerst den Text.'); return; }
-      const wrap = {bold:'**',italic:'*',underline:'__','bold-italic':'***'}[type]||'';
-      const fmt = wrap + sel + wrap;
-      ta.value = ta.value.substring(0, start) + fmt + ta.value.substring(end);
-      const np = start + fmt.length;
-      ta.setSelectionRange(np, np);
-      ta.focus();
-      updatePreview();
-    }
-
-    function insertLineBreak() {
-      const ta = inputText, p = ta.selectionStart;
-      ta.value = ta.value.substring(0, p) + '\n' + ta.value.substring(p);
-      ta.setSelectionRange(p+1, p+1); ta.focus(); updatePreview();
-    }
-
-    function insertParagraph() {
-      const ta = inputText, p = ta.selectionStart;
-      ta.value = ta.value.substring(0, p) + '\n\n' + ta.value.substring(p);
-      ta.setSelectionRange(p+2, p+2); ta.focus(); updatePreview();
-    }
-
-    // === MARKDOWN PARSER ===
-    function parseMarkdown(text) {
-      text = text.replace(/\n\n/g, '</p><p style="margin-bottom:1em;">');
-      text = text.replace(/\n/g, '<br>');
-      text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
-      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      text = text.replace(/__(.*?)__/g, '<u>$1</u>');
-      return '<p style="margin-bottom:1em;">' + text + '</p>';
-    }
-
-    // === SCRAMBLE ===
-    function scrambleWord(word) {
-      if (!shuffleToggle.checked || word.length <= 3) return word;
-      const first = word[0], last = word[word.length-1];
-      const mid = word.slice(1,-1).split('');
-      for (let i = mid.length-1; i > 0; i--) {
-        const j = Math.floor(Math.random()*(i+1));
-        [mid[i], mid[j]] = [mid[j], mid[i]];
-      }
-      return first + mid.join('') + last;
-    }
-
-    // === ERSETZUNGEN ===
-    function applyReplacementsToText(text) {
-      let r = text;
-      if (document.getElementById('replace_e').checked) r = r.replace(/e/gi,'3');
-      if (document.getElementById('replace_a').checked) r = r.replace(/a/gi,'4');
-      if (document.getElementById('replace_i').checked) r = r.replace(/i/gi,'1');
-      if (document.getElementById('replace_o').checked) r = r.replace(/o/gi,'0');
-      if (document.getElementById('replace_s').checked) r = r.replace(/s/gi,'5');
-      if (document.getElementById('replace_t').checked) r = r.replace(/t/gi,'7');
-      [1,2].forEach(n => {
-        if (document.getElementById('custom_active_'+n).checked) {
-          const f = document.getElementById('custom_from_'+n).value;
-          const t = document.getElementById('custom_to_'+n).value;
-          if (f && t) r = r.replace(new RegExp(f,'gi'), t);
-        }
-      });
-      return r;
-    }
-
-    // === CLIP-PATH ===
-    function calculateClipPath(pct) {
-      return `polygon(0 0, 100% 0, 100% ${pct}%, 0 ${pct}%)`;
-    }
-
-    // === HAUPTFUNKTION: PREVIEW ===
-    function updatePreview() {
-      const text = inputText.value || 'Kein Text eingegeben.';
-      let html = parseMarkdown(text);
-      const clipPct = clipSlider.value;
-      const clipPath = calculateClipPath(clipPct);
-
-      // Stats
-      const wc = text.trim().split(/\s+/).length;
-      const cc = text.length;
-      const sh = shuffleToggle.checked ? ' · gemischt' : '';
-      statsDisplay.textContent = `${wc} Wörter · ${cc} Zeichen · ${clipPct}% sichtbar${sh}`;
-
-      // Styling
-      previewText.style.fontSize = fontSize.value + 'px';
-      previewText.style.lineHeight = lineHeight.value;
-      previewText.style.wordSpacing = wordSpacing.value + 'em';
-      previewText.style.fontFamily = fontFamily.value;
-
-      // Verarbeite Text-Nodes
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html;
-
-      function processTextNodes(node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          let t = applyReplacementsToText(node.textContent);
-          if (shuffleToggle.checked) {
-            t = t.split(/(\s+)/).map(w => /\S/.test(w) ? scrambleWord(w) : w).join('');
-          }
-          node.textContent = t;
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          Array.from(node.childNodes).forEach(processTextNodes);
-        }
-      }
-      processTextNodes(tmp);
-
-      // Clipping auf Wort-Ebene
-      function wrapWords(node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          const words = node.textContent.split(/(\s+)/);
-          const frag = document.createDocumentFragment();
-          words.forEach(w => {
-            if (/\S/.test(w)) {
-              const span = document.createElement('span');
-              span.className = 'clipped-text';
-              span.style.clipPath = clipPath;
-              span.textContent = w;
-              frag.appendChild(span);
-            } else {
-              frag.appendChild(document.createTextNode(w));
+        // Keyboard Shortcuts für Formatierung
+        inputText.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'b') {
+                    e.preventDefault();
+                    formatText('bold');
+                } else if (e.key === 'i') {
+                    e.preventDefault();
+                    formatText('italic');
+                } else if (e.key === 'u') {
+                    e.preventDefault();
+                    formatText('underline');
+                }
             }
-          });
-          node.parentNode.replaceChild(frag, node);
-        } else if (node.nodeType === Node.ELEMENT_NODE && node.className !== 'clipped-text') {
-          Array.from(node.childNodes).slice().forEach(wrapWords);
+        });
+
+        // Formatierungs-Funktionen
+        function formatText(type) {
+            const textarea = inputText;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            if (selectedText.length === 0) {
+                alert('Bitte markiere zuerst den Text, den du formatieren möchtest.');
+                return;
+            }
+            
+            let formattedText;
+            switch(type) {
+                case 'bold':
+                    formattedText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    formattedText = `*${selectedText}*`;
+                    break;
+                case 'underline':
+                    formattedText = `__${selectedText}__`;
+                    break;
+                case 'bold-italic':
+                    formattedText = `***${selectedText}***`;
+                    break;
+                default:
+                    formattedText = selectedText;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            
+            // Cursor-Position nach eingefügtem Text setzen
+            const newPos = start + formattedText.length;
+            textarea.setSelectionRange(newPos, newPos);
+            textarea.focus();
+            
+            updatePreview();
         }
-      }
-      wrapWords(tmp);
 
-      previewText.innerHTML = tmp.innerHTML;
-    }
+        function insertLineBreak() {
+            const textarea = inputText;
+            const pos = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, pos) + '\n' + textarea.value.substring(pos);
+            textarea.setSelectionRange(pos + 1, pos + 1);
+            textarea.focus();
+            updatePreview();
+        }
 
-    // === RESET ===
-    function resetDefaults() {
-      clipSlider.value = 100; clipValue.textContent = '100%';
-      fontSize.value = 24; lineHeight.value = 1.8; wordSpacing.value = 0;
-      fontFamily.value = "Arial, sans-serif";
-      inputText.value = 'Der Fuchs ruht. Die Katze springt hoch. Ein junger Adler schwebt majestätisch über den glitzernden Bergseen, während unten im Tal die fleißigen Bauern ihre Felder bestellen. Plötzlich erscheint am Horizont ein mysteriöses Leuchten, das die neugierigen Wissenschaftler in höchste Alarmbereitschaft versetzt und komplexe Untersuchungen erforderlich macht.';
-      document.querySelectorAll('.replace-checkbox').forEach(cb => cb.checked = false);
-      ['custom_from_1','custom_to_1','custom_from_2','custom_to_2'].forEach(id =>
-        document.getElementById(id).value = ''
-      );
-      shuffleToggle.checked = false;
-      updatePreview();
-    }
+        function insertParagraph() {
+            const textarea = inputText;
+            const pos = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, pos) + '\n\n' + textarea.value.substring(pos);
+            textarea.setSelectionRange(pos + 2, pos + 2);
+            textarea.focus();
+            updatePreview();
+        }
 
-    // Initial
-    updatePreview();
-  </script>
+        // Markdown-Parser
+        function parseMarkdown(text) {
+            // Absätze (doppelter Zeilenumbruch)
+            text = text.replace(/\n\n/g, '</p><p style="margin-bottom: 1em;">');
+            
+            // Einzelne Zeilenumbrüche
+            text = text.replace(/\n/g, '<br>');
+            
+            // Fett + Kursiv (muss vor einzelnem Fett/Kursiv kommen)
+            text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+            
+            // Fett
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Kursiv
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Unterstrichen
+            text = text.replace(/__(.*?)__/g, '<u>$1</u>');
+            
+            // In Absatz-Tags wrappen
+            text = '<p style="margin-bottom: 1em;">' + text + '</p>';
+            
+            return text;
+        }
 
+        // Buchstaben-Mischen: Erster und letzter Buchstabe bleiben fix
+        function scrambleWord(word) {
+            if (!shuffleToggle.checked || word.length <= 3) {
+                return word;
+            }
+            
+            const first = word[0];
+            const last = word[word.length - 1];
+            const middle = word.slice(1, -1);
+            
+            // Fisher-Yates Shuffle für die mittleren Buchstaben
+            const middleArray = middle.split('');
+            for (let i = middleArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [middleArray[i], middleArray[j]] = [middleArray[j], middleArray[i]];
+            }
+            
+            return first + middleArray.join('') + last;
+        }
+
+        // Buchstaben-Ersetzung basierend auf aktivierten Checkboxen
+        function applyReplacements(text) {
+            let result = text;
+            
+            // Standard-Ersetzungen
+            if (document.getElementById('replace_e').checked) {
+                result = result.replace(/e/gi, '3');
+            }
+            if (document.getElementById('replace_a').checked) {
+                result = result.replace(/a/gi, '4');
+            }
+            if (document.getElementById('replace_i').checked) {
+                result = result.replace(/i/gi, '1');
+            }
+            if (document.getElementById('replace_o').checked) {
+                result = result.replace(/o/gi, '0');
+            }
+            if (document.getElementById('replace_s').checked) {
+                result = result.replace(/s/gi, '5');
+            }
+            if (document.getElementById('replace_t').checked) {
+                result = result.replace(/t/gi, '7');
+            }
+            
+            // Custom-Ersetzung 1
+            if (document.getElementById('custom_active_1').checked) {
+                const from = document.getElementById('custom_from_1').value;
+                const to = document.getElementById('custom_to_1').value;
+                if (from && to) {
+                    const regex = new RegExp(from, 'gi');
+                    result = result.replace(regex, to);
+                }
+            }
+            
+            // Custom-Ersetzung 2
+            if (document.getElementById('custom_active_2').checked) {
+                const from = document.getElementById('custom_from_2').value;
+                const to = document.getElementById('custom_to_2').value;
+                if (from && to) {
+                    const regex = new RegExp(from, 'gi');
+                    result = result.replace(regex, to);
+                }
+            }
+            
+            return result;
+        }
+
+        // Clip-Path berechnen
+        function calculateClipPath(percentage) {
+            // percentage = wie viel OBEN sichtbar bleibt
+            // Bei 100% → alles sichtbar (polygon(0 0, 100% 0, 100% 100%, 0 100%))
+            // Bei 50% → untere Hälfte abgeschnitten (polygon(0 0, 100% 0, 100% 50%, 0 50%))
+            // Bei 0% → fast alles abgeschnitten (polygon(0 0, 100% 0, 100% 1%, 0 1%))
+            
+            return `polygon(0 0, 100% 0, 100% ${percentage}%, 0 ${percentage}%)`;
+        }
+
+        // Vorschau aktualisieren
+        function updatePreview() {
+            const text = inputText.value || 'Kein Text eingegeben.';
+            
+            // Markdown parsen (vor anderen Manipulationen)
+            let processedText = parseMarkdown(text);
+            
+            const clipPercentage = clipSlider.value;
+            const clipPath = calculateClipPath(clipPercentage);
+
+            // Statistiken
+            const wordCount = text.trim().split(/\s+/).length;
+            const charCount = text.length;
+            const shuffleStatus = shuffleToggle.checked ? ' · Buchstaben gemischt' : '';
+            statsDisplay.textContent = `${wordCount} Wörter · ${charCount} Zeichen · ${clipPercentage}% sichtbar${shuffleStatus}`;
+
+            // Styling für Preview
+            previewText.style.fontSize = fontSize.value + 'px';
+            previewText.style.lineHeight = lineHeight.value;
+            previewText.style.wordSpacing = wordSpacing.value + 'em';
+            previewText.style.fontFamily = fontFamily.value;
+
+            // HTML-Text verarbeiten: Ersetzungen und Scrambling auf Text-Ebene anwenden
+            // Extrahiere reinen Text aus HTML für Manipulationen
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = processedText;
+            
+            // Funktion um Text-Nodes zu verarbeiten
+            function processTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    let textContent = node.textContent;
+                    
+                    // Ersetzungen anwenden
+                    textContent = applyReplacementsToText(textContent);
+                    
+                    // Scrambling auf Wort-Ebene
+                    if (shuffleToggle.checked) {
+                        const words = textContent.split(/(\s+)/); // Behält Whitespace bei
+                        textContent = words.map(word => {
+                            if (/\S/.test(word)) { // Nur nicht-Whitespace Wörter
+                                return scrambleWord(word);
+                            }
+                            return word;
+                        }).join('');
+                    }
+                    
+                    node.textContent = textContent;
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Rekursiv durch Kind-Nodes
+                    Array.from(node.childNodes).forEach(processTextNodes);
+                }
+            }
+            
+            processTextNodes(tempDiv);
+            
+            // Clipping auf Wort-Ebene anwenden (jedes Wort in span wrappen)
+            function wrapWordsWithClipping(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const words = node.textContent.split(/(\s+)/);
+                    const fragment = document.createDocumentFragment();
+                    
+                    words.forEach(word => {
+                        if (/\S/.test(word)) {
+                            const span = document.createElement('span');
+                            span.className = 'clipped-text';
+                            span.style.clipPath = clipPath;
+                            span.textContent = word;
+                            fragment.appendChild(span);
+                        } else {
+                            fragment.appendChild(document.createTextNode(word));
+                        }
+                    });
+                    
+                    node.parentNode.replaceChild(fragment, node);
+                } else if (node.nodeType === Node.ELEMENT_NODE && node.className !== 'clipped-text') {
+                    Array.from(node.childNodes).slice().forEach(wrapWordsWithClipping);
+                }
+            }
+            
+            wrapWordsWithClipping(tempDiv);
+            
+            previewText.innerHTML = tempDiv.innerHTML;
+        }
+
+        // Hilfsfunktion: Ersetzungen nur auf Text anwenden (ohne HTML-Tags zu zerstören)
+        function applyReplacementsToText(text) {
+            let result = text;
+            
+            // Standard-Ersetzungen
+            if (document.getElementById('replace_e').checked) {
+                result = result.replace(/e/gi, '3');
+            }
+            if (document.getElementById('replace_a').checked) {
+                result = result.replace(/a/gi, '4');
+            }
+            if (document.getElementById('replace_i').checked) {
+                result = result.replace(/i/gi, '1');
+            }
+            if (document.getElementById('replace_o').checked) {
+                result = result.replace(/o/gi, '0');
+            }
+            if (document.getElementById('replace_s').checked) {
+                result = result.replace(/s/gi, '5');
+            }
+            if (document.getElementById('replace_t').checked) {
+                result = result.replace(/t/gi, '7');
+            }
+            
+            // Custom-Ersetzung 1
+            if (document.getElementById('custom_active_1').checked) {
+                const from = document.getElementById('custom_from_1').value;
+                const to = document.getElementById('custom_to_1').value;
+                if (from && to) {
+                    const regex = new RegExp(from, 'gi');
+                    result = result.replace(regex, to);
+                }
+            }
+            
+            // Custom-Ersetzung 2
+            if (document.getElementById('custom_active_2').checked) {
+                const from = document.getElementById('custom_from_2').value;
+                const to = document.getElementById('custom_to_2').value;
+                if (from && to) {
+                    const regex = new RegExp(from, 'gi');
+                    result = result.replace(regex, to);
+                }
+            }
+            
+            return result;
+        }
+
+        // Defaults zurücksetzen
+        function resetDefaults() {
+            clipSlider.value = 100;
+            fontSize.value = 24;
+            lineHeight.value = 1.8;
+            wordSpacing.value = 0;
+            fontFamily.value = "Arial, sans-serif";
+            inputText.value = 'Der Fuchs ruht. Die Katze springt hoch. Ein junger Adler schwebt majestätisch über den glitzernden Bergseen, während unten im Tal die fleißigen Bauern ihre Felder bestellen. Plötzlich erscheint am Horizont ein mysteriöses Leuchten, das die neugierigen Wissenschaftler in höchste Alarmbereitschaft versetzt und komplexe Untersuchungen erforderlich macht. Die interdisziplinäre Forschungsgruppe analysierte systematisch sämtliche atmosphärischen Phänomene, wobei sie methodologische Herausforderungen überwinden musste, die selbst erfahrene Meteorologen vor ungeahnte Schwierigkeiten stellten.';
+            clipValue.textContent = '100%';
+            
+            // Alle Ersetzungs-Checkboxen deaktivieren
+            document.querySelectorAll('.replace-checkbox').forEach(cb => cb.checked = false);
+            
+            // Custom-Felder leeren
+            document.getElementById('custom_from_1').value = '';
+            document.getElementById('custom_to_1').value = '';
+            document.getElementById('custom_from_2').value = '';
+            document.getElementById('custom_to_2').value = '';
+            
+            // Shuffle-Toggle deaktivieren
+            shuffleToggle.checked = false;
+            
+            updatePreview();
+        }
+
+        // Initial laden
+        updatePreview();
+    </script>
 </body>
 </html>
