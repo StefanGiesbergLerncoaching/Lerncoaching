@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lerncoaching – Dokumentation & Rechnung</title>
+  <style>
+    :root {
+      --color-primary:       #2D4059;
+      --color-primary-light: #3D5A80;
+      --color-primary-dark:  #1B2A3D;
+      --color-accent:        #F39C12;
+      --color-accent-hover:  #E67E22;
+      --color-accent-light:  #FDF2E0;
+      --color-light:         #ECF0F1;
+      --color-white:         #FFFFFF;
+      --color-text:          #2C3E50;
+      --color-text-light:    #7F8C8D;
+      --color-border:        #DEE2E6;
+      --color-success:       #27AE60;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --r:   8px;
+      --rlg: 12px;
+      --sh:  0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body { font-family: var(--font); color: var(--color-text); background: var(--color-light); line-height: 1.6; }
+
+    /* ── Header ──────────────────────────────────────── */
+    .app-header {
+      background: var(--color-primary);
+      color: white;
+      padding: 1.1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-header h1 { color: white; font-size: 1.2rem; margin: 0; }
+    .app-header p  { color: rgba(255,255,255,0.6); font-size: 0.78rem; }
+
+    /* ── Tabs ────────────────────────────────────────── */
+    .tab-nav { background: var(--color-primary-dark); display: flex; padding: 0 2rem; }
+    .tab-btn {
+      background: none; border: none; border-bottom: 3px solid transparent;
+      color: rgba(255,255,255,0.5); cursor: pointer;
+      font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+      padding: 0.65rem 1.1rem; transition: color 150ms, border-color 150ms;
+    }
+    .tab-btn:hover  { color: white; }
+    .tab-btn.active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+    .tab-pane { display: none; padding: 1.5rem 2rem 3rem; max-width: 880px; margin: 0 auto; }
+    .tab-pane.active { display: block; }
+
+    /* ── Karten ──────────────────────────────────────── */
+    .card {
+      background: var(--color-white); border-radius: var(--rlg);
+      box-shadow: var(--sh); padding: 1.35rem 1.5rem; margin-bottom: 1.1rem;
+    }
+    .card-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--color-primary);
+      margin-bottom: 1rem; padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--color-light);
+    }
+    .card-info {
+      background: var(--color-accent-light); border-left: 4px solid var(--color-accent);
+      border-radius: var(--r); padding: 0.65rem 1rem;
+      font-size: 0.82rem; color: var(--color-text); margin-bottom: 1rem;
+    }
+
+    /* ── Formulare ───────────────────────────────────── */
+    .form-row {
+      display: grid; gap: 0.8rem; margin-bottom: 0.8rem;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .form-row.c2 { grid-template-columns: 1fr 1fr; }
+    .form-row.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-row.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .form-group  { display: flex; flex-direction: column; gap: 0.18rem; }
+    .form-group.span2 { grid-column: span 2; }
+    .form-group.span3 { grid-column: span 3; }
+    .form-group.full  { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--color-text-light);
+    }
+    input[type=text], input[type=date], input[type=number], select, textarea {
+      padding: 0.42rem 0.65rem; border: 2px solid var(--color-border);
+      border-radius: var(--r); font-family: var(--font);
+      font-size: 0.88rem; color: var(--color-text); background: white;
+      transition: border-color 150ms; width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(45,64,89,0.1);
+    }
+    textarea { resize: vertical; }
+
+    /* ── Toggle-Buttons (Anrede Du/Sie) ──────────────── */
+    .toggle-group { display: flex; gap: 0.4rem; margin-top: 0.15rem; }
+    .toggle-group input[type=radio] { display: none; }
+    .toggle-group label {
+      padding: 0.35rem 0.9rem; border: 2px solid var(--color-border);
+      border-radius: var(--r); cursor: pointer; font-size: 0.82rem;
+      font-weight: 600; color: var(--color-text-light);
+      text-transform: none; letter-spacing: 0; transition: all 150ms;
+    }
+    .toggle-group input[type=radio]:checked + label {
+      background: var(--color-primary); color: white;
+      border-color: var(--color-primary);
+    }
+
+    /* ── Checkboxen ──────────────────────────────────── */
+    .check-group { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.2rem; }
+    .check-item  { display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.88rem; }
+    .check-item input[type=checkbox] {
+      width: 16px; height: 16px; cursor: pointer; accent-color: var(--color-primary);
+    }
+
+    /* ── Intervention-Grid ───────────────────────────── */
+    .int-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem 1.5rem;
+      align-items: center;
+    }
+    .int-row  { display: contents; }
+    .int-label { font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; }
+    .int-ha    { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--color-text-light); white-space: nowrap; }
+    .int-ha input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--color-accent-hover); }
+    .int-full  { grid-column: 1 / -1; }
+    .int-divider { grid-column: 1 / -1; height: 1px; background: var(--color-light); margin: 0.3rem 0; }
+
+    /* ── Schieberegler ───────────────────────────────── */
+    .slider-row {
+      display: grid; grid-template-columns: 1fr auto auto;
+      align-items: center; gap: 0.6rem; margin-bottom: 0.65rem;
+    }
+    .slider-label { font-size: 0.85rem; }
+    .slider-track { position: relative; }
+    input[type=range] {
+      -webkit-appearance: none; width: 180px; height: 5px;
+      border-radius: 3px; background: var(--color-border);
+      outline: none; border: none; padding: 0; box-shadow: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--color-primary);
+      cursor: pointer; transition: background 150ms;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { background: var(--color-primary-light); }
+    .slider-val {
+      min-width: 2.2rem; text-align: right;
+      font-size: 0.82rem; font-weight: 700; color: var(--color-primary);
+    }
+    .slider-ends { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--color-text-light); }
+
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.52rem 1.1rem; border: none; border-radius: var(--r);
+      font-family: var(--font); font-size: 0.86rem; font-weight: 600;
+      cursor: pointer; transition: all 150ms;
+    }
+    .btn-primary   { background: var(--color-accent);  color: white; }
+    .btn-primary:hover  { background: var(--color-accent-hover); }
+    .btn-secondary { background: var(--color-primary); color: white; }
+    .btn-secondary:hover { background: var(--color-primary-light); }
+
+    .actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .save-badge {
+      font-size: 0.73rem; padding: 0.18rem 0.6rem;
+      border-radius: 999px; background: var(--color-light);
+      color: var(--color-text-light); transition: all 300ms;
+    }
+    .save-badge.ok { background: #D4EDDA; color: #155724; }
+
+    /* ── Rechnungsvorschau ───────────────────────────── */
+    .invoice-preview {
+      background: white; border: 1px solid var(--color-border);
+      border-radius: var(--rlg); padding: 2.75rem 3.25rem;
+      font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+      font-size: 13px; line-height: 1.5; color: #333; max-width: 680px;
+    }
+    .inv-title   { color: var(--color-primary); font-size: 17px; font-weight: 700; margin-bottom: 1.25rem; }
+    .inv-address { margin-bottom: 2.5rem; line-height: 1.7; }
+    .inv-meta    { text-align: right; margin-bottom: 2.5rem; line-height: 1.9; }
+    .inv-body    { margin-bottom: 1.1rem; }
+    .inv-table   { width: 100%; border-collapse: collapse; margin-bottom: 1.1rem; }
+    .inv-table th, .inv-table td { border: 1px solid #bbb; padding: 0.42rem 0.6rem; vertical-align: top; }
+    .inv-table th { font-weight: 700; }
+    .inv-table td:nth-child(2)  { text-align: right; white-space: nowrap; }
+    .inv-table td:nth-child(3),
+    .inv-table th:nth-child(3)  { text-align: right; white-space: nowrap; }
+    .inv-sum td { font-weight: 700; text-align: right !important; }
+    .inv-text  { margin-bottom: 0.5rem; }
+    .inv-sign  { margin-top: 1.5rem; margin-bottom: 3rem; }
+    .inv-footer {
+      display: flex; justify-content: space-between;
+      border-top: 1px solid #bbb; padding-top: 0.65rem;
+      font-size: 11px; font-weight: 700; color: var(--color-primary);
+    }
+    .inv-footer-right { text-align: right; }
+
+    /* ── Print ───────────────────────────────────────── */
+    @media print {
+      .app-header, .tab-nav, .no-print { display: none !important; }
+      body { background: white; }
+      .tab-pane { display: none !important; }
+      #print-doc { display: block !important; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; margin-bottom: 0.9rem; }
+    }
+    #print-doc { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div>
+    <h1>Lerncoaching – Dokumentation & Rechnung</h1>
+    <p>Stefan Giesberg | Lerncoaching für hochbegabte Kinder</p>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="dokumentation">Falldokumentation</button>
+  <button class="tab-btn"        data-tab="rechnung">Rechnung</button>
+</nav>
+
+<!-- ═══════════════ TAB 1: FALLDOKUMENTATION ═══════════════ -->
+<div id="pane-dokumentation" class="tab-pane active">
+
+  <!-- ── Eltern ── -->
+  <div class="card">
+    <div class="card-title">Eltern</div>
+    <div class="form-row c3">
+      <div class="form-group">
+        <label>Anrede</label>
+        <select id="anrede">
+          <option value="Frau">Frau</option>
+          <option value="Herr">Herr</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vorname</label>
+        <input type="text" id="eltern-vorname" placeholder="Vorname">
+      </div>
+      <div class="form-group">
+        <label>Nachname</label>
+        <input type="text" id="eltern-nachname" placeholder="Nachname">
+      </div>
+    </div>
+    <div class="form-row c3">
+      <div class="form-group span2">
+        <label>Straße & Hausnummer</label>
+        <input type="text" id="strasse" placeholder="z.B. Musterstr. 12">
+      </div>
+      <div class="form-group">
+        <label>PLZ / Ort</label>
+        <div style="display:flex;gap:0.4rem">
+          <input type="text" id="plz" placeholder="PLZ" style="width:90px;flex-shrink:0">
+          <input type="text" id="ort" placeholder="Ort">
+        </div>
+      </div>
+    </div>
+    <div class="form-row c3">
+      <div class="form-group">
+        <label>Anrede (Du / Sie)</label>
+        <div class="toggle-group">
+          <input type="radio" name="anrede-form" id="anrede-du"  value="du">
+          <label for="anrede-du">Du</label>
+          <input type="radio" name="anrede-form" id="anrede-sie" value="sie" checked>
+          <label for="anrede-sie">Sie</label>
+        </div>
+      </div>
+      <div class="form-group span2">
+        <label>Bevorzugte Kommunikation</label>
+        <div class="check-group" style="margin-top:0.35rem">
+          <label class="check-item"><input type="checkbox" id="komm-mail"> Mail</label>
+          <label class="check-item"><input type="checkbox" id="komm-messenger"> Messenger</label>
+          <label class="check-item"><input type="checkbox" id="komm-telefon"> Telefon</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Kind ── -->
+  <div class="card">
+    <div class="card-title">Kind</div>
+    <div class="form-row c4">
+      <div class="form-group">
+        <label>Vorname</label>
+        <input type="text" id="kind-vorname" placeholder="Vorname">
+      </div>
+      <div class="form-group">
+        <label>Geschlecht</label>
+        <select id="kind-geschlecht">
+          <option value="Tochter">Tochter</option>
+          <option value="Sohn">Sohn</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Alter</label>
+        <input type="number" id="kind-alter" placeholder="z.B. 10" min="4" max="20">
+      </div>
+      <div class="form-group">
+        <label>Klasse</label>
+        <input type="text" id="kind-klasse" placeholder="z.B. 4b">
+      </div>
+    </div>
+    <div class="form-row c4">
+      <div class="form-group">
+        <label>Akzeleration</label>
+        <div style="display:flex;gap:0.4rem;align-items:center">
+          <select id="akzel-sign" style="width:60px;flex-shrink:0">
+            <option value="+">+</option>
+            <option value="-">−</option>
+          </select>
+          <input type="number" id="akzel-wert" placeholder="x" min="0" max="5" style="width:70px">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>IQ (Gesamtwert)</label>
+        <input type="number" id="iq-gesamt" placeholder="z.B. 135" min="70" max="200">
+      </div>
+    </div>
+    <div style="margin-top:0.25rem; margin-bottom:0.5rem">
+      <label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-light)">IQ-Subskalen</label>
+    </div>
+    <div class="form-row c3">
+      <div class="form-group">
+        <label>AFI</label>
+        <input type="number" id="iq-afi" placeholder="Wert" min="40" max="160">
+      </div>
+      <div class="form-group">
+        <label>Arbeitsgedächtnis</label>
+        <input type="number" id="iq-agd" placeholder="Wert" min="40" max="160">
+      </div>
+      <div class="form-group">
+        <label>Sprachverständnis</label>
+        <input type="number" id="iq-spv" placeholder="Wert" min="40" max="160">
+      </div>
+    </div>
+    <div class="form-row c3">
+      <div class="form-group">
+        <label>Räumlich-visuell</label>
+        <input type="number" id="iq-rv" placeholder="Wert" min="40" max="160">
+      </div>
+      <div class="form-group">
+        <label>Freitext 1 – Bezeichnung</label>
+        <input type="text" id="iq-ft1-name" placeholder="z.B. Verarbeitungsgeschw.">
+      </div>
+      <div class="form-group">
+        <label>Freitext 1 – Wert</label>
+        <input type="number" id="iq-ft1-wert" placeholder="Wert" min="40" max="160">
+      </div>
+    </div>
+    <div class="form-row c3">
+      <div class="form-group" style="grid-column:2">
+        <label>Freitext 2 – Bezeichnung</label>
+        <input type="text" id="iq-ft2-name" placeholder="z.B. …">
+      </div>
+      <div class="form-group">
+        <label>Freitext 2 – Wert</label>
+        <input type="number" id="iq-ft2-wert" placeholder="Wert" min="40" max="160">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Session-Metadaten ── -->
+  <div class="card">
+    <div class="card-title">Sitzung</div>
+    <div class="form-row c3">
+      <div class="form-group">
+        <label>Datum Videokonferenz</label>
+        <input type="date" id="datum">
+      </div>
+      <div class="form-group">
+        <label>Rechnungsnummer</label>
+        <input type="text" id="rechnungsnummer" placeholder="008-03.2026">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Segment 1: Phase Vertrauen ── -->
+  <div class="card">
+    <div class="card-title">Segment 1 – Phase Vertrauen</div>
+    <div class="form-row c2">
+      <div class="form-group">
+        <label>Lieblingsfächer</label>
+        <textarea id="seg1-lieblings" rows="3" placeholder="z.B. Mathe, Sport, Kunst…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Hassfächer</label>
+        <textarea id="seg1-hass" rows="3" placeholder="z.B. Deutsch, Religion…"></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Kommentar</label>
+      <textarea id="seg1-kommentar" rows="3" placeholder="Beobachtungen zur Vertrauensphase, erste Eindrücke…"></textarea>
+    </div>
+  </div>
+
+  <!-- ── Segment 2: Allgemeine Testung ── -->
+  <div class="card">
+    <div class="card-title">Segment 2 – Allgemeine Testung</div>
+    <div class="check-group">
+      <label class="check-item"><input type="checkbox" id="seg2-hunde"> Hund(e)</label>
+      <label class="check-item"><input type="checkbox" id="seg2-kreativ"> kreativ</label>
+      <label class="check-item"><input type="checkbox" id="seg2-neugierig"> neugierig</label>
+      <label class="check-item"><input type="checkbox" id="seg2-farbschwaeche"> Farbschwäche</label>
+    </div>
+  </div>
+
+  <!-- ── Segment 3: Lesen ── -->
+  <div class="card">
+    <div class="card-title">Segment 3 – Lesen</div>
+    <div style="margin-bottom:0.75rem">
+      <div class="slider-ends" style="width:calc(180px + 3rem + 0.6rem); margin-left:auto; text-align:right; justify-content:flex-end; gap:0.5rem; margin-bottom:0.2rem;">
+        <span style="margin-right:auto">0 = nie / kaum</span><span>100 = durchgehend</span>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label">Buchstabenweise</span>
+      <input type="range" id="lese-buchstaben" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-buchstaben">0</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Silbenweise</span>
+      <input type="range" id="lese-silben" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-silben">0</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Endsilben betont</span>
+      <input type="range" id="lese-endsilben" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-endsilben">0</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Ungewöhnliche Betonung</span>
+      <input type="range" id="lese-betonung" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-betonung">0</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Raten – Basis Wort</span>
+      <input type="range" id="lese-raten-wort" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-raten-wort">0</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Raten – Basis Kontext</span>
+      <input type="range" id="lese-raten-kontext" min="0" max="100" value="0"
+             oninput="updSlider(this)">
+      <span class="slider-val" id="v-lese-raten-kontext">0</span>
+    </div>
+
+    <div class="form-group" style="margin-top:0.75rem">
+      <label>Kommentar Leseverhalten</label>
+      <textarea id="lese-freitext" rows="3" placeholder="Weitere Beobachtungen…"></textarea>
+    </div>
+  </div>
+
+  <!-- ── Segment 4: Intervention ── -->
+  <div class="card">
+    <div class="card-title">Segment 4 – Intervention</div>
+
+    <div class="int-grid">
+
+      <div class="int-label">
+        <input type="checkbox" id="int-laufdiktat" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Laufdiktat
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-laufdiktat-ha"> HA
+      </div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-sinneinheiten" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Sinneinheiten erklärt
+      </div>
+      <div class="int-ha"><!-- kein HA --></div>
+
+      <div class="int-divider"></div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-oberlaengen" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Oberlängen gelesen
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-oberlaengen-ha"> HA
+      </div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-leet" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Leet gelesen
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-leet-ha"> HA
+      </div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-wortmix" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Wortmix gelesen
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-wortmix-ha"> HA
+      </div>
+
+      <div class="int-divider"></div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-foto" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Mentales Foto gemacht
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-foto-ha"> HA
+      </div>
+
+      <div class="int-full" style="margin:0.3rem 0 0.5rem; padding-left:1.5rem">
+        <div class="slider-row">
+          <span class="slider-label" style="font-size:0.8rem; color:var(--color-text-light)">Mentales Foto hat geklappt</span>
+          <input type="range" id="int-foto-klappt" min="0" max="100" value="50"
+                 oninput="updSlider(this)">
+          <span class="slider-val" id="v-int-foto-klappt">50</span>
+        </div>
+        <div class="slider-ends" style="padding-left:calc(100% - 180px - 2.2rem - 0.6rem); font-size:0.65rem; color:var(--color-text-light)">
+          <span>schlecht</span><span>sehr gut</span>
+        </div>
+      </div>
+
+      <div class="int-divider"></div>
+
+      <div class="int-label">
+        <input type="checkbox" id="int-vokabeln" style="width:15px;height:15px;accent-color:var(--color-primary)">
+        Vokabeln werfen gemacht
+      </div>
+      <div class="int-ha">
+        <input type="checkbox" id="int-vokabeln-ha"> HA
+      </div>
+
+      <div class="int-full" style="margin:0.3rem 0 0.5rem; padding-left:1.5rem">
+        <div class="slider-row">
+          <span class="slider-label" style="font-size:0.8rem; color:var(--color-text-light)">Vokabeln werfen hat geklappt</span>
+          <input type="range" id="int-vokabeln-klappt" min="0" max="100" value="50"
+                 oninput="updSlider(this)">
+          <span class="slider-val" id="v-int-vokabeln-klappt">50</span>
+        </div>
+        <div class="slider-ends" style="padding-left:calc(100% - 180px - 2.2rem - 0.6rem); font-size:0.65rem; color:var(--color-text-light)">
+          <span>schlecht</span><span>sehr gut</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Abschluss / Notizen ── -->
+  <div class="card">
+    <div class="card-title">Abschluss & Notizen</div>
+    <div class="form-group">
+      <label>Freie Notizen / Zusammenfassung / Empfehlungen</label>
+      <textarea id="freitext-final" rows="10"
+        placeholder="Gesamteindruck, Empfehlungen für Eltern, nächste Schritte, Auffälligkeiten, sonstiges…"></textarea>
+    </div>
+  </div>
+
+  <div class="actions no-print">
+    <button class="btn btn-secondary" onclick="printDoc()">📄 Als PDF drucken</button>
+    <span class="save-badge" id="save-badge">Nicht gespeichert</span>
+  </div>
+
+</div><!-- /pane-dokumentation -->
+
+
+<!-- ═══════════════ TAB 2: RECHNUNG ═══════════════ -->
+<div id="pane-rechnung" class="tab-pane">
+
+  <div class="card-info no-print">
+    Adresse, Kind und Datum werden aus dem Tab <strong>Falldokumentation</strong> übernommen.
+  </div>
+
+  <div class="card no-print">
+    <div class="card-title">Leistungspositionen</div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Zeile 1 – Begutachtung (100 €)</label>
+      <input type="text" id="leistung1" placeholder="Begutachtung der individuellen Lese- und Schreibtaktik">
+    </div>
+    <div class="form-group">
+      <label>Zeile 2 – Intervention (200 €)</label>
+      <input type="text" id="leistung2" placeholder="Intervention zur gezielten Optimierung">
+    </div>
+  </div>
+
+  <div class="invoice-preview" id="invoice-preview">
+    <em style="color:#aaa;font-size:0.85rem">Vorschau wird geladen…</em>
+  </div>
+
+  <div class="actions no-print" style="margin-top:1.1rem">
+    <button class="btn btn-primary" onclick="downloadWord()">⬇ Als Word (.doc) herunterladen</button>
+  </div>
+
+</div><!-- /pane-rechnung -->
+
+
+<!-- PRINT-ONLY -->
+<div id="print-doc"></div>
+
+
+<script>
+/* ── Slider-Anzeige ─────────────────────────────────── */
+function updSlider(el) {
+  const disp = document.getElementById('v-' + el.id);
+  if (disp) disp.textContent = el.value;
+  saveData();
+}
+
+/* ── Persistenz ─────────────────────────────────────── */
+function saveData() {
+  const d = {};
+  document.querySelectorAll('input[type=text],input[type=date],input[type=number],select,textarea')
+    .forEach(el => { if (el.id) d[el.id] = el.value; });
+  document.querySelectorAll('input[type=range]')
+    .forEach(el => { if (el.id) d[el.id] = el.value; });
+  document.querySelectorAll('input[type=checkbox]')
+    .forEach(el => { if (el.id) d[el.id] = el.checked; });
+  document.querySelectorAll('input[type=radio]')
+    .forEach(el => { if (el.id) d[el.id] = el.checked; });
+
+  localStorage.setItem('lerncoaching_v2', JSON.stringify(d));
+  const b = document.getElementById('save-badge');
+  const t = new Date().toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  b.textContent = 'Gespeichert ' + t;
+  b.className   = 'save-badge ok';
+
+  if (document.getElementById('pane-rechnung').classList.contains('active')) renderInvoice();
+}
+
+function loadData() {
+  const raw = localStorage.getItem('lerncoaching_v2');
+  if (!raw) {
+    // Defaults
+    document.getElementById('rechnungsnummer').value = '008-03.2026';
+    document.getElementById('leistung1').value = 'Begutachtung der individuellen Lese- und Schreibtaktik';
+    document.getElementById('leistung2').value = 'Intervention zur gezielten Optimierung';
+    return;
+  }
+  const d = JSON.parse(raw);
+  document.querySelectorAll('input[type=text],input[type=date],input[type=number],select,textarea')
+    .forEach(el => { if (el.id && d[el.id] !== undefined) el.value = d[el.id]; });
+  document.querySelectorAll('input[type=range]')
+    .forEach(el => {
+      if (el.id && d[el.id] !== undefined) {
+        el.value = d[el.id];
+        const disp = document.getElementById('v-' + el.id);
+        if (disp) disp.textContent = d[el.id];
+      }
+    });
+  document.querySelectorAll('input[type=checkbox]')
+    .forEach(el => { if (el.id && d[el.id] !== undefined) el.checked = d[el.id]; });
+  document.querySelectorAll('input[type=radio]')
+    .forEach(el => { if (el.id && d[el.id] !== undefined) el.checked = d[el.id]; });
+}
+
+// Auto-save
+document.querySelectorAll('input:not([type=range]),select,textarea')
+  .forEach(el => { el.addEventListener('change', saveData); el.addEventListener('input', saveData); });
+
+/* ── Tab-Navigation ─────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pane-' + tab).classList.add('active');
+    if (tab === 'rechnung') renderInvoice();
+  });
+});
+
+/* ── Hilfsfunktionen ────────────────────────────────── */
+function v(id)      { return (document.getElementById(id) || {}).value || ''; }
+function chk(id)    { const el = document.getElementById(id); return el ? el.checked : false; }
+function radio(name){ const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+
+function dateLong(s) {
+  if (!s) return '–';
+  const [y,m,d] = s.split('-');
+  const M = ['Januar','Februar','März','April','Mai','Juni',
+              'Juli','August','September','Oktober','November','Dezember'];
+  return `${parseInt(d)}. ${M[parseInt(m)-1]} ${y}`;
+}
+function dateShort(s) {
+  if (!s) return '–';
+  const [y,m,d] = s.split('-'); return `${d}.${m}.${y}`;
+}
+
+/* ── Rechnung: Vorschau ─────────────────────────────── */
+function invoiceData() {
+  const anrede   = v('anrede');
+  const nname    = v('eltern-nachname');
+  const kindName = v('kind-vorname');
+  const kindGes  = v('kind-geschlecht');
+  const datum    = v('datum');
+  const kindRef  = kindGes === 'Sohn' ? `Ihres Sohnes ${kindName}` : `Ihrer Tochter ${kindName}`;
+  const greeting = anrede === 'Herr' ? `Lieber Herr ${nname}` : `Liebe Frau ${nname}`;
+  return {
+    anrede, vname: v('eltern-vorname'), nname,
+    strasse: v('strasse'), plz: v('plz'), ort: v('ort'),
+    datum,
+    rnr:    v('rechnungsnummer') || '008-03.2026',
+    l1:     v('leistung1') || 'Begutachtung der individuellen Lese- und Schreibtaktik',
+    l2:     v('leistung2') || 'Intervention zur gezielten Optimierung',
+    kindRef, greeting,
+    dLong: dateLong(datum), dShort: dateShort(datum),
+    kindName
+  };
+}
+
+function invoiceBody(d, forWord) {
+  const tClass = forWord ? '' : 'inv-table';
+  return `
+<p class="${forWord ? '' : 'inv-body'}">
+  ${d.greeting},
+</p>
+<p class="${forWord ? 'ibody' : 'inv-body'}">
+  vielen Dank für Ihr Vertrauen in meine Lerncoaching Sitzung mit ${d.kindRef}.<br>
+  Vereinbarungsgemäß stelle ich Ihnen folgenden Betrag für die erbrachten Leistungen in Rechnung:
+</p>
+<table class="${tClass}">
+  <thead><tr><th>Beschreibung</th><th>Datum</th><th>Betrag</th></tr></thead>
+  <tbody>
+    <tr><td>${d.l1}</td><td>${d.dLong}</td><td>100,- €</td></tr>
+    <tr><td>${d.l2}</td><td>${d.dLong}</td><td>200,- €</td></tr>
+    <tr class="${forWord ? 'isum' : 'inv-sum'}"><td colspan="2">&nbsp;</td><td>Summe: 300,- €</td></tr>
+  </tbody>
+</table>
+<p class="${forWord ? 'itext' : 'inv-text'}">Es wird keine Mehrwertsteuer berechnet.</p>
+<p class="${forWord ? 'itext' : 'inv-text'}">Bitte überweisen Sie den Rechnungsbetrag von 300,- € innerhalb von 28 Tagen auf das unten angegebene Konto. Vielen Dank!</p>
+<div class="${forWord ? 'isign' : 'inv-sign'}">Mit freundlichen Grüßen<br><br>Stefan Giesberg</div>
+<div class="${forWord ? 'ifoot' : 'inv-footer'}">
+  <div>Stefan Giesberg<br>Brauerstr. 46<br>47058 Duisburg<br>(+49)176 42405967</div>
+  <div class="${forWord ? 'ifr' : 'inv-footer-right'}"><strong>Bankverbindung:</strong><br>Stefan Giesberg<br>Bank: Targobank<br>BIC: CMCIDEDD<br>IBAN: DE32 3002 0900 2905740423</div>
+</div>`;
+}
+
+function renderInvoice() {
+  const d = invoiceData();
+  document.getElementById('invoice-preview').innerHTML = `
+    <div class="inv-title">Rechnung</div>
+    <div class="inv-address">${d.anrede} ${d.vname} ${d.nname}<br>${d.strasse}<br>${d.plz} ${d.ort}</div>
+    <div class="inv-meta">Rechnungsnummer: ${d.rnr}<br><br>Datum ${d.dShort}</div>
+    ${invoiceBody(d, false)}`;
+}
+
+/* ── Word-Download ──────────────────────────────────── */
+function downloadWord() {
+  const d = invoiceData();
+  const css = `
+    body{font-family:Calibri,Arial,sans-serif;font-size:12pt;color:#333;margin:2.5cm 2.5cm 2cm}
+    h1{color:#2D4059;font-size:15pt;margin-bottom:16pt}
+    .iaddr{margin-bottom:34pt;line-height:1.7}
+    .imeta{text-align:right;margin-bottom:34pt;line-height:1.9}
+    .ibody{margin-bottom:8pt}
+    table{width:100%;border-collapse:collapse;margin:10pt 0 13pt}
+    th,td{border:1px solid #aaa;padding:5pt 7pt;vertical-align:top}
+    th{font-weight:700}
+    td:nth-child(2){text-align:right;white-space:nowrap}
+    td:nth-child(3),th:nth-child(3){text-align:right;white-space:nowrap}
+    .isum td{font-weight:700;text-align:right!important}
+    .itext{margin-bottom:5pt}
+    .isign{margin-top:20pt;margin-bottom:48pt}
+    .ifoot{border-top:1pt solid #aaa;padding-top:6pt;font-size:9pt;font-weight:700;color:#2D4059;overflow:hidden}
+    .ifr{float:right;text-align:right}`;
+
+  const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office'
+    xmlns:w='urn:schemas-microsoft-com:office:word'
+    xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='UTF-8'><style>${css}</style></head>
+<body>
+<h1>Rechnung</h1>
+<div class="iaddr">${d.anrede} ${d.vname} ${d.nname}<br>${d.strasse}<br>${d.plz} ${d.ort}</div>
+<div class="imeta">Rechnungsnummer: ${d.rnr}<br><br>Datum ${d.dShort}</div>
+${invoiceBody(d, true)}
+</body></html>`;
+
+  const blob = new Blob(['\uFEFF' + html], { type: 'application/msword' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  const dp   = d.datum ? d.datum.replace(/-/g, '.') : 'Datum';
+  a.download = `${dp} ${d.nname} ${d.kindName}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ── PDF-Druck ──────────────────────────────────────── */
+function sliderLabel(id) {
+  return `${v(id)} / 100`;
+}
+function boolList(items) {
+  return items.filter(x => x).join(', ') || '–';
+}
+
+function printDoc() {
+  const leseSliders = [
+    ['Buchstabenweise',      'lese-buchstaben'],
+    ['Silbenweise',          'lese-silben'],
+    ['Endsilben betont',     'lese-endsilben'],
+    ['Ungewöhnl. Betonung',  'lese-betonung'],
+    ['Raten – Basis Wort',   'lese-raten-wort'],
+    ['Raten – Basis Kontext','lese-raten-kontext'],
+  ];
+  const leseBar = leseSliders.map(([lbl,id]) => {
+    const val = parseInt(v(id) || 0);
+    return `<tr><td style="padding:3pt 6pt;font-size:10pt">${lbl}</td>
+      <td style="padding:3pt 6pt;width:200px">
+        <div style="background:#ECF0F1;border-radius:3px;height:10px">
+          <div style="background:#2D4059;width:${val}%;height:10px;border-radius:3px"></div>
+        </div>
+      </td>
+      <td style="padding:3pt 6pt;font-size:10pt;font-weight:700;text-align:right">${val}</td></tr>`;
+  }).join('');
+
+  const intItems = [
+    ['int-laufdiktat','Laufdiktat','int-laufdiktat-ha'],
+    ['int-sinneinheiten','Sinneinheiten erklärt',null],
+    ['int-oberlaengen','Oberlängen gelesen','int-oberlaengen-ha'],
+    ['int-leet','Leet gelesen','int-leet-ha'],
+    ['int-wortmix','Wortmix gelesen','int-wortmix-ha'],
+    ['int-foto','Mentales Foto','int-foto-ha'],
+    ['int-vokabeln','Vokabeln werfen','int-vokabeln-ha'],
+  ];
+  const intRows = intItems.map(([id,lbl,haId]) => {
+    const done = chk(id);
+    const ha   = haId ? chk(haId) : null;
+    if (!done && ha !== true) return '';
+    let txt = `<strong>${lbl}</strong>`;
+    if (ha === true) txt += ' <span style="color:#F39C12;font-size:9pt">(+ HA)</span>';
+    return `<li style="margin-bottom:3pt">${txt}</li>`;
+  }).filter(Boolean).join('');
+
+  const fotoKlappt   = parseInt(v('int-foto-klappt') || 50);
+  const vokaKlappt   = parseInt(v('int-vokabeln-klappt') || 50);
+
+  const komm = [
+    chk('komm-mail')      ? 'Mail'      : null,
+    chk('komm-messenger') ? 'Messenger' : null,
+    chk('komm-telefon')   ? 'Telefon'   : null,
+  ].filter(Boolean).join(', ') || '–';
+
+  const seg2Tags = [
+    chk('seg2-hunde')       ? 'Hund(e)'      : null,
+    chk('seg2-kreativ')     ? 'kreativ'       : null,
+    chk('seg2-neugierig')   ? 'neugierig'     : null,
+    chk('seg2-farbschwaeche') ? 'Farbschwäche': null,
+  ].filter(Boolean).join(', ') || '–';
+
+  const iq1Name = v('iq-ft1-name'); const iq1Wert = v('iq-ft1-wert');
+  const iq2Name = v('iq-ft2-name'); const iq2Wert = v('iq-ft2-wert');
+
+  document.getElementById('print-doc').innerHTML = `
+<div style="font-family:'Segoe UI',Arial,sans-serif;font-size:10.5pt;color:#2C3E50;padding:2rem 2.5rem">
+  <div style="border-bottom:2px solid #2D4059;padding-bottom:0.5rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <div style="font-size:15pt;font-weight:700;color:#2D4059">Lerncoaching – Falldokumentation</div>
+      <div style="font-size:8.5pt;color:#7F8C8D">Stefan Giesberg · Lerncoaching für hochbegabte Kinder</div>
+    </div>
+    <div style="text-align:right;font-size:9pt;color:#7F8C8D">
+      Datum: ${dateLong(v('datum'))}<br>Rechnung: ${v('rechnungsnummer')}
+    </div>
+  </div>
+
+  <!-- Eltern + Kind -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div style="background:#ECF0F1;border-radius:8px;padding:0.75rem 1rem">
+      <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;margin-bottom:0.4rem">Eltern</div>
+      <strong>${v('anrede')} ${v('eltern-vorname')} ${v('eltern-nachname')}</strong><br>
+      ${v('strasse')}, ${v('plz')} ${v('ort')}<br>
+      <span style="font-size:9pt;color:#7F8C8D">Anrede: ${radio('anrede-form') === 'du' ? 'Du' : 'Sie'} &nbsp;·&nbsp; Kommunikation: ${komm}</span>
+    </div>
+    <div style="background:#ECF0F1;border-radius:8px;padding:0.75rem 1rem">
+      <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;margin-bottom:0.4rem">Kind</div>
+      <strong>${v('kind-vorname')}</strong> &nbsp;·&nbsp; ${v('kind-geschlecht')} &nbsp;·&nbsp; ${v('kind-alter')} Jahre &nbsp;·&nbsp; Klasse ${v('kind-klasse')}<br>
+      Akzeleration: ${v('akzel-sign')}${v('akzel-wert')} &nbsp;·&nbsp; IQ: ${v('iq-gesamt')}<br>
+      <span style="font-size:9pt;color:#7F8C8D">
+        AFI ${v('iq-afi')} · AGD ${v('iq-agd')} · SPV ${v('iq-spv')} · RV ${v('iq-rv')}
+        ${iq1Name ? ` · ${iq1Name} ${iq1Wert}` : ''}${iq2Name ? ` · ${iq2Name} ${iq2Wert}` : ''}
+      </span>
+    </div>
+  </div>
+
+  <!-- Seg 1 -->
+  <div style="margin-bottom:0.9rem;page-break-inside:avoid">
+    <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;border-bottom:1px solid #DEE2E6;padding-bottom:2pt;margin-bottom:0.5rem">Segment 1 – Phase Vertrauen</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.5rem">
+      <div><span style="font-weight:600">Lieblingsfächer:</span> ${v('seg1-lieblings') || '–'}</div>
+      <div><span style="font-weight:600">Hassfächer:</span> ${v('seg1-hass') || '–'}</div>
+    </div>
+    <div style="white-space:pre-wrap">${v('seg1-kommentar') || ''}</div>
+  </div>
+
+  <!-- Seg 2 -->
+  <div style="margin-bottom:0.9rem;page-break-inside:avoid">
+    <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;border-bottom:1px solid #DEE2E6;padding-bottom:2pt;margin-bottom:0.5rem">Segment 2 – Allgemeine Testung</div>
+    ${seg2Tags}
+  </div>
+
+  <!-- Seg 3 Lesen -->
+  <div style="margin-bottom:0.9rem;page-break-inside:avoid">
+    <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;border-bottom:1px solid #DEE2E6;padding-bottom:2pt;margin-bottom:0.5rem">Segment 3 – Lesen</div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:0.5rem">${leseBar}</table>
+    <div style="white-space:pre-wrap;font-size:9.5pt">${v('lese-freitext') || ''}</div>
+  </div>
+
+  <!-- Seg 4 Intervention -->
+  <div style="margin-bottom:0.9rem;page-break-inside:avoid">
+    <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;border-bottom:1px solid #DEE2E6;padding-bottom:2pt;margin-bottom:0.5rem">Segment 4 – Intervention</div>
+    <ul style="padding-left:1.25rem;margin-bottom:0.5rem">${intRows || '<li style="color:#aaa">keine Intervention dokumentiert</li>'}</ul>
+    ${chk('int-foto') ? `<div style="font-size:9pt;color:#666;margin-bottom:3pt">Mentales Foto – Erfolg: <strong>${fotoKlappt}/100</strong></div>` : ''}
+    ${chk('int-vokabeln') ? `<div style="font-size:9pt;color:#666">Vokabeln werfen – Erfolg: <strong>${vokaKlappt}/100</strong></div>` : ''}
+  </div>
+
+  <!-- Freitext -->
+  <div style="margin-bottom:0.9rem;page-break-inside:avoid">
+    <div style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#7F8C8D;border-bottom:1px solid #DEE2E6;padding-bottom:2pt;margin-bottom:0.5rem">Abschluss & Notizen</div>
+    <div style="white-space:pre-wrap">${v('freitext-final') || ''}</div>
+  </div>
+
+  <div style="margin-top:2.5rem;border-top:1px solid #DEE2E6;padding-top:0.5rem;font-size:8pt;color:#95A5A6;display:flex;justify-content:space-between">
+    <span>Stefan Giesberg · Brauerstr. 46 · 47058 Duisburg</span>
+    <span>Erstellt: ${new Date().toLocaleDateString('de-DE')}</span>
+  </div>
+</div>`;
+  window.print();
+}
+
+/* ── Init ───────────────────────────────────────────── */
+loadData();
+</script>
+</body>
+</html>
